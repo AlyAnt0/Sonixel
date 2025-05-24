@@ -1,0 +1,127 @@
+{
+  "name": "Sonixel Tileset Testing 01",
+  "ogmoVersion": "3.4.0",
+  "levelPaths": ["."],
+  "backgroundColor": "#282c34ff",
+  "gridColor": "#3c4049cc",
+  "anglesRadians": false,
+  "directoryDepth": 5,
+  "layerGridDefaultSize": {"x": 16, "y": 16},
+  "levelDefaultSize": {"x": 320, "y": 240},
+  "levelMinSize": {"x": 128, "y": 128},
+  "levelMaxSize": {"x": 4096, "y": 4096},
+  "levelValues": [],
+  "defaultExportMode": ".json",
+  "compactExport": false,
+  "externalScript": "",
+  "playCommand": "",
+  "entityTags": [],
+  "layers": [
+    {
+      "definition": "tile",
+      "name": "tiles1",
+      "gridSize": {"x": 16, "y": 16},
+      "exportID": "85317419",
+      "exportMode": 0,
+      "arrayMode": 0,
+      "defaultTileset": "tileset1"
+    },
+    {
+      "definition": "entity",
+      "name": "entity",
+      "gridSize": {"x": 16, "y": 16},
+      "exportID": "85996858",
+      "requiredTags": [],
+      "excludedTags": []
+    },
+    {
+      "definition": "grid",
+      "name": "new_layer",
+      "gridSize": {"x": 16, "y": 16},
+      "exportID": "18345601",
+      "arrayMode": 0,
+      "legend": {"0": "#00000000", "1": "#000000ff"}
+    }
+  ],
+  "entities": [
+    {
+      "exportID": "85374769",
+      "name": "player",
+      "limit": -1,
+      "size": {"x": 16, "y": 16},
+      "origin": {"x": 0, "y": 0},
+      "originAnchored": true,
+      "shape": {
+        "label": "Rectangle",
+        "points": [
+          {"x": -1, "y": -1},
+          {"x": 1, "y": -1},
+          {"x": -1, "y": 1},
+          {"x": 1, "y": -1},
+          {"x": -1, "y": 1},
+          {"x": 1, "y": 1}
+        ]
+      },
+      "color": "#ff0000ff",
+      "tileX": false,
+      "tileY": false,
+      "tileSize": {"x": 48, "y": 48},
+      "resizeableX": false,
+      "resizeableY": false,
+      "rotatable": false,
+      "rotationDegrees": 360,
+      "canFlipX": false,
+      "canFlipY": false,
+      "canSetColor": false,
+      "hasNodes": false,
+      "nodeLimit": 0,
+      "nodeDisplay": 0,
+      "nodeGhost": true,
+      "tags": [],
+      "values": [],
+      "texture": "../images/Sonic-export.png",
+      "textureImage": "data:image/png;base64,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"
+    },
+    {
+      "exportID": "44980825",
+      "name": "Ring",
+      "limit": -1,
+      "size": {"x": 16, "y": 16},
+      "origin": {"x": 0, "y": 0},
+      "originAnchored": true,
+      "shape": {
+        "label": "Rectangle",
+        "points": [
+          {"x": -1, "y": -1},
+          {"x": 1, "y": -1},
+          {"x": -1, "y": 1},
+          {"x": 1, "y": -1},
+          {"x": -1, "y": 1},
+          {"x": 1, "y": 1}
+        ]
+      },
+      "color": "#ff0000ff",
+      "tileX": false,
+      "tileY": false,
+      "tileSize": {"x": 16, "y": 16},
+      "resizeableX": false,
+      "resizeableY": false,
+      "rotatable": false,
+      "rotationDegrees": 360,
+      "canFlipX": false,
+      "canFlipY": false,
+      "canSetColor": false,
+      "hasNodes": false,
+      "nodeLimit": 0,
+      "nodeDisplay": 0,
+      "nodeGhost": true,
+      "tags": [],
+      "values": [],
+      "texture": "../images/RingOgmo.png",
+      "textureImage": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsSAAALEgHS3X78AAAAG3RFWHRTb2Z0d2FyZQBDZWxzeXMgU3R1ZGlvIFRvb2zBp+F8AAAAy0lEQVQ4y82TMRqDIAyFXzbc2tEjAUfx8zR+HkV6JEa71Y0OSkyA2o7NqHk/D/JCKSWUNU/3NIwGQCx/UfVBAk7hp4oViAFSPE8bwmNTUmcNClfEAO+6lBuyeAkvZde7Lp2glSEMWMIN87RhGFe6uAP3Hk6InDV8unfP6uQWQF6HnDUHEQDipbjlQgBic0z/DgDEI64A+q/vUI5cjfEXFzqtkaog7ZDaie4BZ4ajXENk9cLBHvEcOLVMOq6msH7uhwwbtdY5g8pqpfQNtDunLQ0S2jAAAAAASUVORK5CYII="
+    }
+  ],
+  "tilesets": [
+    {"label": "tileset1", "path": "../haxe/haxeflixel projects/actual/SonicEngine/assets/images/tileset1.png", "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAYAAACLz2ctAAAAAXNSR0IArs4c6QAAAn1JREFUeJzt3MlxIkEQQNFkQgbJBpkjg2SObMAjzWUmgkAsvVRl0lXvXUWIWj5NAw0RAAAAiU7VA1jj8/v9Z8ntvj7Oh5rXzF56o5YG94wgX9dLbUyr4J4ZJcj/63Xk+bzt/QdZ0bR0OeYjb94I/lQPgLntPgLO6N5RP/NoejmGz+/3n1c4km95NhTgE2sW9dZtXyGMHlqdeu1enCOeA166DqT3fFoEWXEE7rUuAvy3adnz2BJL9vugGWsiwI/zqWoOj0JpPaalUWavxfQBVqt+AFTv3+FPkKsXcNQXGVmmfh/w6+N8ElCtaQO8DE+EdaYM8FZwIqwxXYCPQhNhvqkCXBKYCHNNE+CasESYZ4oAtwQlwhyHX+Rn7wPuDelVvwbQ6mLU6vkNHWDFZ6K9Q7weS1aA11rNc9gAW4ewdqOy7r8qwFb3P2SAvY5CWzardyDVAe4dR5PBV56wt35KWnt/S60dV9a5Wa/P0peOa/Hgq5+C7qn4gtGeTXs2xux1zriY49EYf/3hCFcEX6o6Crc+d6p6MVB9IW7J1cD3BrNF5Rdyqi8FizhegNfeql8FHd3R5189/iE+Cal4FFcfOUYxRIARuUGIr51hAozICUN8bQ0VYETfQMTX3nABRvQJRXx9DBlgRNtgxNfPsAFGtAlHfH0NHWDEvoDE19/wAUZsC0l8OaYIMGL/z6zRxzQBRiwLS3y5pgow4nFg4ss3XYARt0MTX40pA4z4/RvLlWOZ2dS/ES08AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGMNfopBSMdPNtLkAAAAASUVORK5CYII=", "tileWidth": 16, "tileHeight": 16, "tileSeparationX": 0, "tileSeparationY": 0, "tileMarginX": 0, "tileMarginY": 0}
+  ]
+}

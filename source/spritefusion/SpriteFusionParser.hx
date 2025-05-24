@@ -1,0 +1,6 @@
+package spritefusion;
+
+class SpriteFusionParser
+{
+	
+}
