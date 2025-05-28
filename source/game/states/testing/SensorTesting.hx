@@ -1,4 +1,4 @@
-package game.states;
+package game.states.testing;
 
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;

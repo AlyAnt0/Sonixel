@@ -3,30 +3,13 @@ package game.states;
 import flixel.graphics.frames.FlxTileFrames;
 import game.collision.Tile;
 import flixel.group.FlxSpriteGroup;
-import game.const.PlayerConst;
 import game.object.Player;
 import game.object.BackgroundParallax;
 import game.managers.PlayManager;
-import flixel.FlxBasic;
 import flixel.FlxG;
-import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.display.FlxBackdrop;
-import flixel.addons.display.FlxGridOverlay;
-import flixel.addons.editors.ogmo.FlxOgmo3Loader;
-import flixel.addons.tile.FlxTilemapExt;
-import flixel.group.FlxGroup;
-import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
 import flixel.math.FlxPoint;
-import flixel.text.FlxText;
-import flixel.tile.FlxTile;
-import flixel.tile.FlxTilemap;
-import flixel.util.FlxSpriteUtil.DrawStyle;
-import flixel.util.FlxSpriteUtil.LineStyle;
-import flixel.util.FlxSpriteUtil;
-import haxe.ds.Map;
-import openfl.utils.Assets;
 
 using flixel.util.FlxSpriteUtil;
 
@@ -113,7 +96,13 @@ class PlayState extends FlxState
 	function debugTweaks(elapsed:Float):Void
 	{
 		if (FlxG.keys.justPressed.F5)
-			FlxG.switchState(new SensorTesting());
+		{
+			FlxG.switchState(new game.states.testing.SensorTesting());
+			if(FlxG.keys.pressed.ALT)
+			{
+				// TODO: another testing state using differ of how i could making it
+			}
+		}
 
 		if(FlxG.keys.justPressed.F9)
 		{
@@ -121,7 +110,7 @@ class PlayState extends FlxState
 
 			var FPS:Int = 60;
 			if(isLow)
-				FPS = 10;
+				FPS = 5;
 			else
 				FPS = 60;
 
