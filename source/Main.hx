@@ -40,6 +40,9 @@ class Main extends Sprite
 	private function setupGame():Void
 	{
 		addChild(new FlxGame(320, 240, PlayState, 60, 60, true));
+		TileData.init();
+		//test
+		trace(TileData.anglesData);
 		#if flxstudio
 		FlxStudio.create();
 		#end

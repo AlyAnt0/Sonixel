@@ -1,5 +1,6 @@
 package game.data;
 
+import haxe.crypto.Base64;
 import haxe.io.Bytes;
 import sys.io.File;
 import game.structs.TileStruct;
@@ -9,23 +10,37 @@ class TileData
 	public static var widthArray:Array<Array<Int>> = [];
 	public static var heightArray:Array<Array<Int>> = [];
 	public static var anglesData:Array<Int> = [];
-	public static function init(file:String):Void
+	public static function init():Void
 	{
-		function getFileArrays(returnArray:Array<Array<Int>>,bytesData:Bytes):Array<Array<Int>>
+		// heights and widths array mode
+		function getFileArrays(bytes:Bytes):Array<Array<Int>>
 		{
-			for (i in 0...bytesData.length)
+			var returnArray:Array<Array<Int>> = [];
+			for (i in 0...bytes.length)
 			{
-				if(i % 16 == 0)
+				if(i % TILE_SIZE == 0)
 				{
-					final array:Array<Int> = [];
+					var array:Array<Int> = [];
 					for(j in 0...15)
-						array.push(bytesData.getUInt16(i + j) >> 8); // convert to 8 bits number
+						array.push(bytes.getUInt16(i + j) >> 8); // convert to 8 bits number
 					returnArray.push(array);
 				}
 			}
 			return returnArray;
 		}
-		TileData.heightArray = getFileArrays(TileData.heightArray, File.getBytes("height.bin"));
+		// angle data mode
+		function getAnglesData(bytes:Bytes):Array<Int>
+		{
+			var returnArray:Array<Int> = [];
+			for (i in 0...bytes.length)
+				returnArray.push(bytes.getUInt16(i) >> 8);
+			return returnArray;
+		}
+
+		final game:String = 'sonic2';
+		TileData.widthArray = 	getFileArrays(Base64.decode(Base64Encrypted.getWidthArray(game)));
+		TileData.heightArray = 	getFileArrays(Base64.decode(Base64Encrypted.getHeightsArray(game)));
+		TileData.anglesData =	getAnglesData(Base64.decode(Base64Encrypted.getAnglesArray(game)));
 	}
 
 	/**

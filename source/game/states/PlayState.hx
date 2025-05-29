@@ -100,7 +100,7 @@ class PlayState extends FlxState
 			FlxG.switchState(new game.states.testing.SensorTesting());
 			if(FlxG.keys.pressed.ALT)
 			{
-				// TODO: another testing state using differ of how i could making it
+				// TODO: another testing state but using differ of how i could making it
 			}
 		}
 
