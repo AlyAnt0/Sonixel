@@ -37,7 +37,7 @@ class Tile
 
 		this.tileIndex = index;
 
-		final returnArray = TileData.getDataFromIndex(tileIndex);
+		final returnArray = TileData.getDataFromIndexManual(tileIndex);
 		if (returnArray != null && index != 0)
 		{
 			widthArray	= returnArray[0];
