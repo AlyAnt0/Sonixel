@@ -37,9 +37,8 @@
 	<haxelib name="flixel" version="5.6.2"/>
 	<haxelib name="flixel-addons" version="3.0.2"/>
 	<haxelib name="flixel-ui" version="2.6.1"/>
-	<haxelib name="differ" />
+	<haxelib name="differ" if="DIFFER_COLLISION"/>
 	<haxelib name="flixel-studio" />
-	<haxelib name="hxcpp-debug-server"/>
 	<haxelib name="ldtk-haxe-api"/>
 
 	<!--In case you want to use nape with flixel-->

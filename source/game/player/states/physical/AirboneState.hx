@@ -21,7 +21,5 @@ class AirboneState extends State
 			player.stateMachine.switchState('normal');
 			return;
 		}
-
-		trace(player.grounded);
 	}
 }

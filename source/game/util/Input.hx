@@ -19,6 +19,8 @@ class Input
 				return FlxKey.DOWN;
 			case A:
 				return FlxKey.A;
+			case DEBUG_MODE:
+				return FlxKey.X;
 		}
 		
 		return FlxKey.NONE;
@@ -52,4 +54,5 @@ private enum Key
 	UP;
 	DOWN;
 	A;
+	DEBUG_MODE;
 }

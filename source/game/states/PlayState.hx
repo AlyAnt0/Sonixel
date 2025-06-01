@@ -38,7 +38,7 @@ class PlayState extends FlxState
 
 		BackgroundParallax.setupBackground('TEST');
 
-		final level = Main.ldtkProject.all_worlds.Default.all_levels.testlevel_1;
+		final level = Main.ldtkProject.all_worlds.Default.all_levels.testlevel_s2;
 		currentLevel = level;
 		final tiles = level.l_collision;
 		final collisionLayerDebug:FlxSpriteGroup = new FlxSpriteGroup();
@@ -54,13 +54,13 @@ class PlayState extends FlxState
 						// the tile data
 						var newCollision = new Tile(xx, yy, tiledata.flipBits & 1 != 0, tiledata.flipBits & 2 != 0, tiledata.tileId);
 						worldCollisionLayer[newCollision.posX * newCollision.posY] =  newCollision;
-						trace(newCollision.posX);
-						trace(newCollision.posY);
 
 						// now the sprite itself
 						var tile = new FlxSprite(xx * Global.TILE_SIZE, yy * Global.TILE_SIZE);
-						tile.frames = FlxTileFrames.fromBitmapAddSpacesAndBorders(TILESET_PATH, FlxPoint.get(Global.TILE_SIZE, Global.TILE_SIZE));
+						tile.frames = FlxTileFrames.fromBitmapAddSpacesAndBorders(TILESET_PATH, FlxPoint.get(Global.TILE_SIZE, Global.TILE_SIZE), FlxPoint.get(2,2));
 						tile.frame = tile.frames.frames[tiledata.tileId];
+						tile.flipX = newCollision.flipX;
+						tile.flipY = newCollision.flipY;
 						collisionLayerDebug.add(tile);
 					}
 				}

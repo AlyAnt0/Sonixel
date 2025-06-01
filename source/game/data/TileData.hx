@@ -1,5 +1,6 @@
 package game.data;
 
+import openfl.system.System;
 import haxe.crypto.Base64;
 import haxe.io.Bytes;
 import sys.io.File;
@@ -21,8 +22,10 @@ class TileData
 				if(i % TILE_SIZE == 0)
 				{
 					var array:Array<Int> = [];
-					for(j in 0...15)
-						array.push(bytes.getUInt16(i + j) >> 8); // convert to 8 bits number
+					for(j in 0...TILE_SIZE)
+						array.push(bytes.getUInt16(((i-1) + j)) >> 8); // convert to 8 bits number
+
+					// trace(array);
 					returnArray.push(array);
 				}
 			}
@@ -38,9 +41,9 @@ class TileData
 		}
 
 		final game:String = 'sonic2';
-		TileData.widthArray = 	getFileArrays(Base64.decode(Base64Encrypted.getWidthArray(game)));
-		TileData.heightArray = 	getFileArrays(Base64.decode(Base64Encrypted.getHeightsArray(game)));
-		TileData.anglesData =	getAnglesData(Base64.decode(Base64Encrypted.getAnglesArray(game)));
+		TileData.widthArray 	= 	getFileArrays(Base64.decode(Base64Encrypted.getWidthArray(game)));
+		TileData.heightArray	= 	getFileArrays(Base64.decode(Base64Encrypted.getHeightsArray(game)));
+		TileData.anglesData 	=	getAnglesData(Base64.decode(Base64Encrypted.getAnglesArray(game)));
 	}
 
 	/**
@@ -84,9 +87,9 @@ class TileData
 	}
 
 	public static function getTileAngle(tileIndex:Int):UInt
-		return TileData.anglesData[tileIndex];
+		return TileData?.anglesData[tileIndex];
 	public static function getWidthArray(tileIndex:Int):Array<UInt> 
-		return TileData.widthArray[tileIndex];
+		return TileData?.widthArray[tileIndex];
 	public static function getHeightArray(tileIndex:Int):Array<UInt>
-		return TileData.heightArray[tileIndex];
+		return TileData?.heightArray[tileIndex];
 }

@@ -56,7 +56,7 @@ class NormalState extends State
 	override function init():Void
 	{
 		// ele imediatamente se encaixa no chao
-		final currentResult = player.giveWinSensor().getTileVertical(PlayState.inst.worldCollisionLayer);
+		final currentResult = player.giveWinSensorGround().getTileVertical(PlayState.inst.worldCollisionLayer);
 		player.groundSensorCollision(currentResult);
 	}
 
@@ -66,16 +66,13 @@ class NormalState extends State
 		{
 			//checkSpindash();
 
-			//align to the block surface
-			if(player.grounded)
-			{
-				final currentResult = player.giveWinSensor().getTileVertical(PlayState.inst.worldCollisionLayer);
-				player.groundSensorCollision(currentResult);
-			}
 			// ja que o codigo do estado atual e apenas ativo quando esta no chao, entao o codigo e escrito como se o jogador estivesse no chao
 			player.calculateSpeedWithAngle();
 
 			processInput();
+
+			//align to the block surface
+			player.groundCheck();
 
 			if (FlxG.keys.justPressed.ONE)
 			{
@@ -87,6 +84,9 @@ class NormalState extends State
 				}
 				player.stateMachine.switchState('hurt');
 			}
+			if(Input.isJustPressed(DEBUG_MODE))
+				if(player != null)
+					player.stateMachine.switchState('debug');
 
 			player.move(elapsed);
 		}

@@ -1,5 +1,6 @@
 package game.player;
 
+import flixel.FlxG;
 import game.object.Player;
 
 class State
@@ -16,5 +17,10 @@ class State
 
 	public function init():Void {}
 
-	public function update(elapsed:Float):Void {}
+	public function update(elapsed:Float):Void 
+	{
+		if(Input.isJustPressed(DEBUG_MODE))
+			if(player != null)
+				player.stateMachine.switchState('debug');
+	}
 }

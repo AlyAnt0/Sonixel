@@ -1,5 +1,6 @@
 package game.object;
 
+import game.collision.Tile;
 import game.player.states.physical.DebugMode;
 import game.base.Object;
 import flixel.util.FlxColor;
@@ -243,8 +244,8 @@ class Player extends Object
 	public function setupSensors():Void
 	{
 		final tags:Array<Dynamic> = [
-			[A, LEFT],
-			[B, RIGHT],
+			[A, DOWN],
+			[B, DOWN],
 			[C, UP],
 			[D, UP],
 			[E, LEFT],
@@ -361,7 +362,7 @@ class Player extends Object
 
 	public function groundCheck():Void
 	{
-		final sensorResult = giveWinSensor().getTileVertical(PlayState.inst.worldCollisionLayer);
+		final sensorResult = giveWinSensorGround().getTileVertical(giveWinSensorGround().position.x, giveWinSensorGround().position.y, PlayState.inst.worldCollisionLayer);
 		if (sensorResult[2] > 0)
 		{
 			grounded = true;
@@ -371,28 +372,87 @@ class Player extends Object
 		FlxG.watch.addQuick("Player's Grounded", grounded);
 	}
 
-	public function giveWinSensor():Sensor
+	public function giveWinSensorGround():Sensor
 	{
 		final sensorA:Sensor = sensors[A];
 		final sensorB:Sensor = sensors[B];
 
 		var winSensor:Sensor = null;
-		
+		var targetTileInA:Bool = sensorA.checkTheresATile(sensorA.position.x, sensorA.position.y); 
+		var targetTileInB:Bool = sensorB.checkTheresATile(sensorB.position.x, sensorB.position.y);
+
 		final colors:Array<FlxColor> = [FlxColor.WHITE, FlxColor.RED];
-		if(sensorA.checkTheresATile() && !sensorB.checkTheresATile())
+		// scrapped and very broken system
+		// if(sensorA.checkTheresATile() && !sensorB.checkTheresATile())
+		// {
+		// 	winSensor = sensorA;
+		// 	sensorA.spr.color = colors[1];
+		// 	sensorB.spr.color = colors[0];
+		// }
+		// else if (sensorB.checkTheresATile() && !sensorA.checkTheresATile())
+		// {
+		// 	winSensor = sensorB;
+		// 	sensorB.spr.color = colors[1];
+		// 	sensorA.spr.color = colors[0];
+		// }
+		// else
+		// 	winSensor = sensorA;
+
+		//REAL WINNER SENSOR ALGORYTHM
+		if(targetTileInA)
 		{
-			winSensor = sensorA;
-			sensorA.spr.color = colors[1];
-			sensorB.spr.color = colors[0];
+			//the position of sensor A can be the target tile
+			final tileResA = sensorA.getTileHorizontal(sensorA.position.x, sensorA.position.y, PlayState.inst.worldCollisionLayer);
+			final tileResB = sensorB.getTileHorizontal(sensorA.position.x, sensorA.position.y, PlayState.inst.worldCollisionLayer);
+
+			if(tileResA != null || tileResB != null)
+			{
+				FlxG.watch.addQuick("Sensor A Ground Distance", tileResA[2]);
+				FlxG.watch.addQuick("Sensor B Ground Distance", tileResB[2]);
+				
+				//check if the distance of sensor A is greater than B
+				if (tileResA[2] < tileResB[2])
+				{
+					winSensor = sensorA;
+					sensorA.spr.color = colors[1];
+					sensorB.spr.color = colors[0];
+				}
+				else
+				{
+					winSensor = sensorB;
+					sensorB.spr.color = colors[1];
+					sensorA.spr.color = colors[0];
+				}
+			}
 		}
-		else if (sensorB.checkTheresATile() && !sensorA.checkTheresATile())
+		else if(targetTileInB)
 		{
-			winSensor = sensorB;
-			sensorB.spr.color = colors[1];
-			sensorA.spr.color = colors[0];
+			//the position of sensor B can be the target tile 
+			final tileResB = sensorB.getTileHorizontal(sensorB.position.x, sensorB.position.y, PlayState.inst.worldCollisionLayer);
+			final tileResA = sensorA.getTileHorizontal(sensorB.position.x, sensorB.position.y, PlayState.inst.worldCollisionLayer);
+			if(tileResB != null || tileResA != null)
+			{
+				FlxG.watch.addQuick("Sensor A Ground Distance", tileResA[2]);
+				FlxG.watch.addQuick("Sensor B Ground Distance", tileResB[2]);
+				
+				//check if the distance of sensor B is greater than A
+				if (tileResB[2] > tileResA[2])
+				{
+					winSensor = sensorB;
+					sensorB.spr.color = colors[1];
+					sensorA.spr.color = colors[0];
+				}
+				else
+				{
+					winSensor = sensorA;
+					sensorA.spr.color = colors[1];
+					sensorB.spr.color = colors[0];
+				}
+			}
 		}
 		else
 			winSensor = sensorA;
+		FlxG.watch.addQuick("Winner Sensor", winSensor.tag);
 		
 		return winSensor;
 	}
@@ -409,28 +469,6 @@ class Player extends Object
 				y = (anchorY - result[4]) - this.height;
 			}
 		}
-	}
-
-	private function airCollisionLevel():Void
-	{
-		var move:String = "";
-		if (Math.abs(speed.x) > Math.abs(speed.y))
-			move = speed.x < 0 ? "left" : "right";
-		else 
-			move = speed.y < 0 ? "up" : "down";
-
-		switch (move)
-		{
-			case "left":
-
-			case "right":
-
-			case "up":
-
-			case "down":
-				
-		}
-		
 	}
 }
 

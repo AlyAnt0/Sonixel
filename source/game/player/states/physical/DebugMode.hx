@@ -22,5 +22,9 @@ class DebugMode extends State
 
 		player.speed.x = vel * movex;
 		player.speed.y = vel * movey;
+
+		if(Input.isJustPressed(DEBUG_MODE))
+			if(player != null)
+				player.stateMachine.switchState('normal');
 	}
 }

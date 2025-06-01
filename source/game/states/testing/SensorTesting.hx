@@ -57,7 +57,6 @@ class SensorTesting extends FlxState
 			}
 		}
 		trace('check existence');
-		trace(worldCollisionLayer.exists(getMultipliedCoords(9, 7)));
 		add(collisionLayerDebug);
 
 		//for seeing if the surface is working, AND THIS IS A PROGRESS!
@@ -72,17 +71,18 @@ class SensorTesting extends FlxState
 
 	function placeDotsAtSurface():Void
 	{
-		final tile = worldCollisionLayer[getMultipliedCoords(9,7)];
+		final tile = worldCollisionLayer[getMultipliedCoords(9,6)];
 		final surface = tile.heightArray;
 		for(x in 0...TILE_SIZE)
 		{
 			//trace('surface now ' + tile.heightArray[x]);
-
+				
 			//the anchor is in bottom
 			final anchorY = (tile.posY * TILE_SIZE) + TILE_SIZE-1;
 			final finalY = anchorY-surface[x];
 			addDot((tile.posX*TILE_SIZE)+x,finalY,1,FlxColor.RED);
 		}
+		trace(surface);
 	}
 
 	override function update(elapsed:Float):Void
@@ -121,6 +121,5 @@ class SensorTesting extends FlxState
 		{
 			surfaceDot.setPosition(-1,-1);
 		}
-		trace(scanResult[2]);
 	}
 }

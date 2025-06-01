@@ -34,15 +34,23 @@ class Tile
 	{
 		this.posX = posX;
 		this.posY = posY;
+		this.flipX = flipX;
+		this.flipY = flipY;
 
 		this.tileIndex = index;
 
-		final returnArray = TileData.getDataFromIndexManual(tileIndex);
-		if (returnArray != null && index != 0)
+		if (index != 0)
 		{
-			widthArray	= returnArray[0];
-			heightArray = returnArray[1];
-			tileAngle   = returnArray[2];
+			widthArray	= TileData.getWidthArray(index);
+			heightArray = TileData.getHeightArray(index);
+			tileAngle   = TileData.getTileAngle(index);
+
+			if(this.flipX)
+				heightArray.reverse();
+			if(this.flipY)
+			{
+				//TODO: some algorythm for inverting the height array correctly in flipY
+			}
 		}
 	}
 }
