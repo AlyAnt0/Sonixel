@@ -1,5 +1,9 @@
 package game.const;
 
+
+/**
+ * Originally created in 07.09.2024.
+ */
 class PlayerConst
 {
 	// STAND, ROLL

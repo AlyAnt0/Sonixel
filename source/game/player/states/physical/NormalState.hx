@@ -55,9 +55,9 @@ class NormalState extends State
 
 	override function init():Void
 	{
-		// ele imediatamente se encaixa no chao
-		final currentResult = player.giveWinSensorGround().getTileVertical(PlayState.inst.worldCollisionLayer);
-		player.groundSensorCollision(currentResult);
+		// // ele imediatamente se encaixa no chao
+		// final currentResult = player.giveWinSensorGround().getTileVertical(player.giveWinSensorGround().position.x, player.giveWinSensorGround().position.y, PlayState.inst.worldCollisionLayer);
+		// player.groundSensorCollision(currentResult);
 	}
 
 	override function update(elapsed:Float):Void
@@ -71,8 +71,7 @@ class NormalState extends State
 
 			processInput();
 
-			//align to the block surface
-			player.groundCheck();
+			player.move(elapsed);
 
 			if (FlxG.keys.justPressed.ONE)
 			{
@@ -87,8 +86,8 @@ class NormalState extends State
 			if(Input.isJustPressed(DEBUG_MODE))
 				if(player != null)
 					player.stateMachine.switchState('debug');
-
-			player.move(elapsed);
+			//align to the block surface
+			player.groundCollide();
 		}
 	}
 

@@ -12,6 +12,11 @@ import flixel.addons.studio.FlxStudio;
 class Main extends Sprite
 {
 	public static var ldtkProject = new LdtkProject();
+
+	public static var defaultWorld(get, never):LdtkProject_World;
+	public static function get_defaultWorld():LdtkProject_World
+		return Main.ldtkProject.all_worlds.Default;
+
 	public static function main():Void
 	{
 		Lib.current.addChild(new Main());

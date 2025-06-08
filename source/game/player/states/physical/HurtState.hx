@@ -25,7 +25,7 @@ class HurtState extends State
 	override function update(elapsed:Float)
 	{
 		player.move(elapsed);
-		player.groundCheck();
+		player.airCollide();
 
 		player.applyGravity();	
 

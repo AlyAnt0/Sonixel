@@ -6,6 +6,10 @@ import haxe.io.Bytes;
 import sys.io.File;
 import game.structs.TileStruct;
 
+/**
+ * Originally created in 06.10.2024.
+ */
+
 class TileData
 {
 	public static var widthArray:Array<Array<Int>> = [];

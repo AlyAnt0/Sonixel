@@ -1,5 +1,8 @@
 package game.managers;
 
+/**
+ * Originally created in 07.02.2024.
+ */
 class PlayManager
 {
 	public var initialized:Bool = false;

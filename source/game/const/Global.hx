@@ -1,5 +1,10 @@
 package game.const;
 
+import game.collision.Tile.TileSolidity;
+
+/**
+ * Originally created in 21.06.24.
+ */
 class Global
 {
 	// Game Initalization global variables.
@@ -17,7 +22,26 @@ class Global
 
 	// Tile global variables.
 	public static final TILE_SIZE:Int = 16;
-	public static final EMPTY_TILE:Array<Dynamic> = [-1, 0, 0, false];
+	public static final EMPTY_TILE_HORIZONTAL = {
+				index: -1,
+				tileAngle: 0.0,
+				distance: 0.0,
+				tileSurfaceX: 0,
+				height: 0,
+				tileX: -1,
+				tileY: -1,
+				solidity: TileSolidity.EMPTY
+		};
+	public static final EMPTY_TILE_VERTICAL = {
+				index: -1,
+				tileAngle: 0.0,
+				distance: -999.0,
+				tileSurfaceY: -1,
+				height: -1,
+				tileX: -1,
+				tileY: -1,
+				solidity: TileSolidity.EMPTY
+		};
 
 	public static final CURRENT_CHUNK_INDEX:Int = 1;
 	public static final AVALIABLE_CHUNK_SIZES:Array<Int> = [128, 256];

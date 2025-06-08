@@ -1,5 +1,8 @@
 package game.player.states.physical;
 
+import game.collision.Sensor;
+import game.collision.Sensor.SensorTag;
+
 class AirboneState extends State
 {
 	public function new()
@@ -15,7 +18,8 @@ class AirboneState extends State
 
 		player.applyGravity();
 
-		player.groundCheck();
+		player.airCollide();
+		
 		if(player.grounded)
 		{
 			player.stateMachine.switchState('normal');

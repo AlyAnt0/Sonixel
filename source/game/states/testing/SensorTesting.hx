@@ -10,6 +10,9 @@ import flixel.FlxSprite;
 import flixel.FlxState;
 import game.collision.Sensor;
 
+/**
+ * Orignally created in 04.26.24.
+ */
 class SensorTesting extends FlxState
 {
 	public var worldCollisionLayer:Map<Int, Tile> = [];
@@ -30,7 +33,7 @@ class SensorTesting extends FlxState
 
 		var ldtk = Main.ldtkProject;
 
-		final tiles = ldtk.all_worlds.Default.all_levels.testsensor.l_collision;
+		final tiles = ldtk.all_worlds.Default.all_levels.TESTSENSOR.l_COLLISION;
 		final collisionLayerDebug:FlxSpriteGroup = new FlxSpriteGroup();
 		for(xx in 0...tiles.cWid)
 		{
@@ -110,12 +113,14 @@ class SensorTesting extends FlxState
 
 	function distance():Void
 	{
-		final scanResult = testSensor.getTileVertical(worldCollisionLayer);
+		final cellX = Math.floor(testSensor.position.x / TILE_SIZE);
+		final cellY = Math.floor(testSensor.position.y / TILE_SIZE);
+		final scanResult = Tile.getTileVertical(testSensor.position.x, testSensor.position.y, cellX, cellY, worldCollisionLayer);
 
 		if (worldCollisionLayer.exists(getMultipliedCoords(Math.floor(testSensor.position.x / TILE_SIZE), Math.floor(testSensor.position.y / TILE_SIZE))))
 		{
 			surfaceDot.x = Math.floor(testSensor.position.x);
-			surfaceDot.y = scanResult[3];
+			surfaceDot.y = scanResult.tileSurfaceY;
 		}
 		else
 		{

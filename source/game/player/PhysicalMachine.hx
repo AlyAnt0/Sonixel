@@ -3,6 +3,9 @@ package game.player;
 import flixel.util.FlxSignal;
 import game.object.Player;
 
+/**
+ * Originally created in 07.09.2024.
+ */
 class PhysicalMachine
 {
 	public var host:Player = null;

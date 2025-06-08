@@ -52,6 +52,9 @@ enum StateEnum
 //TODO
 //main collision, and so much other stuff
 
+/**
+ * The exact original creation date is unknown.
+ */
 class Player extends Object
 {
 	public var spr:FlxSprite;
@@ -76,6 +79,7 @@ class Player extends Object
 
 	public var developerView:Bool = false;
 	public var debugMode:Bool = true;
+	public var collision:Map<Int, Tile> = [];
 
 	public var sensors:Map<SensorTag, Sensor> = new Map<SensorTag, Sensor>();
 
@@ -122,7 +126,7 @@ class Player extends Object
 		FlxPoint.get(24, 33) // spin
 	];
 
-	public function new(playerID:PlayerID):Void
+	public function new(playerID:PlayerID, world:Map<Int, Tile>):Void
 	{
 		super();
 		loadGraphic('assets/images/Sonic.png', true, 48, 48);
@@ -147,12 +151,8 @@ class Player extends Object
 		// final radHeight = PlayerConst.RADIUSES[playerID][0][1]*2;	
 
 		//rspr = new FlxSprite(radiusArray[0], radiusArray[2]).makeGraphic(Std.int(radWidth), Std.int(radHeight), 0x6ee1ff00);
+		this.collision = world;
 		move();
-	}
-
-	function sensorSprite(x:Float = 0, y:Float = 0):FlxSprite
-	{
-		return new FlxSprite(x, y).makeGraphic(1,1,FlxColor.WHITE);
 	}
 
 	public function updateOriginPoint(anim:String):Void
@@ -203,15 +203,16 @@ class Player extends Object
 				(anim == "idle" || anim == "lookUp" || anim == "lookOnYOUFirstF" ||
 				anim == "lookOnYOU" || anim == "chillS" || anim == "chill" ||
 				anim == "walk" || anim == "run");
-
+			final pushRadius = 10;
+			final standRadiusWidth = 9, standHeightRadius = 19;
 			// A, B, C, D, E, F
 			final sensorPosStand:Array<FlxPoint> = [
-				FlxPoint.get(radiusArray[MLEFT]+1, radiusArray[MBOTTOM]),
-				FlxPoint.get(radiusArray[MRIGHT]-1, radiusArray[MBOTTOM]),
-				FlxPoint.get(radiusArray[MLEFT], radiusArray[MTOP]),
-				FlxPoint.get(radiusArray[MRIGHT], radiusArray[MTOP]),
-				FlxPoint.get(radiusArray[MLEFT]-1, radiusArray[MBOTTOM]/2),
-				FlxPoint.get(radiusArray[MRIGHT]+1, radiusArray[MBOTTOM]/2),
+				FlxPoint.get(center.x-standRadiusWidth, center.y+standHeightRadius),
+				FlxPoint.get(center.x+standRadiusWidth, center.y+standHeightRadius),
+				FlxPoint.get(center.x-standRadiusWidth, center.y-standHeightRadius),
+				FlxPoint.get(center.x+standRadiusWidth, center.y-standHeightRadius),
+				FlxPoint.get(center.x-pushRadius, center.y+8),
+				FlxPoint.get(center.x+pushRadius, center.y+8),
 			];
 			final sensorPosRoll:Array<FlxPoint> = [
 				FlxPoint.get(radiusArray[MLEFT], radiusArray[MBOTTOM]),
@@ -334,10 +335,12 @@ class Player extends Object
 		super.move(elapsed);
 		// ALIGN THE STUFF
 		updateOriginPoint(animation.curAnim.name);
-
 		final centerX:Float = (x + origin.x);
 		final centerY:Float = (y + origin.y);
-		updateRadius(animation.curAnim.name, centerX, centerY);
+		center.x = centerX;
+		center.y = centerY;
+
+		updateRadius(animation.curAnim.name, center.x, center.y);
 		updateSensorsPositions(animation.curAnim.name);
 
 		if ((x+16) < 0)
@@ -347,6 +350,7 @@ class Player extends Object
 		}
 
 		FlxG.watch.addQuick("Players's Position", [Math.floor(x), Math.floor(y)]);
+		FlxG.watch.addQuick("Player's Center", center.toString());
 
 		FlxG.watch.addQuick("Player's XSpeed", speed.x);
 		FlxG.watch.addQuick("Player's YSpeed", speed.y);
@@ -360,26 +364,44 @@ class Player extends Object
 		if (speed.y > 16) speed.y = 16;
 	}
 
-	public function groundCheck():Void
+	public function groundCollide():Void
 	{
-		final sensorResult = giveWinSensorGround().getTileVertical(giveWinSensorGround().position.x, giveWinSensorGround().position.y, PlayState.inst.worldCollisionLayer);
-		if (sensorResult[2] > 0)
-		{
-			grounded = true;
-			groundSensorCollision(sensorResult);
-		}
+		final winnerSensor = giveWinSensorGround();
+		final sensorResult = Tile.getTileVerticalDouble(winnerSensor.position.x, winnerSensor.position.y, 0, 15, PlayState.inst.worldCollisionLayer);
+		FlxG.watch.addQuick("Ground sensor result", sensorResult);
+		groundSensorCollision(sensorResult?.near);
 		
-		FlxG.watch.addQuick("Player's Grounded", grounded);
+		FlxG.watch.addQuick("Player's Grounded", this.grounded);
 	}
 
+	public function groundSensorCollision(result:Dynamic):Void
+	{
+		if(result != null)
+		{
+			if (result.solidity != EMPTY)
+			{
+				if(result.distance >= 0)
+				{
+					trace('aligned to ${result.distance} pixels to the ground');
+					y -= result.distance;
+					grounded = true;
+				}
+			}
+			else
+			{
+				return;
+			}
+		}
+	}
 	public function giveWinSensorGround():Sensor
 	{
 		final sensorA:Sensor = sensors[A];
 		final sensorB:Sensor = sensors[B];
 
 		var winSensor:Sensor = null;
-		var targetTileInA:Bool = sensorA.checkTheresATile(sensorA.position.x, sensorA.position.y); 
-		var targetTileInB:Bool = sensorB.checkTheresATile(sensorB.position.x, sensorB.position.y);
+		var targetTileInA:Bool = Tile.checkTheresATile(Math.floor(sensorA.position.x / TILE_SIZE), Math.floor(sensorA.position.y / TILE_SIZE), PlayState.inst.worldCollisionLayer); 
+		var targetTileInB:Bool = Tile.checkTheresATile(Math.floor(sensorB.position.x / TILE_SIZE), Math.floor(sensorB.position.y / TILE_SIZE), PlayState.inst.worldCollisionLayer);
+		// trace([targetTileInA, targetTileInB]);
 
 		final colors:Array<FlxColor> = [FlxColor.WHITE, FlxColor.RED];
 		// scrapped and very broken system
@@ -399,19 +421,20 @@ class Player extends Object
 		// 	winSensor = sensorA;
 
 		//REAL WINNER SENSOR ALGORYTHM
+		final world = PlayState.inst.worldCollisionLayer;
 		if(targetTileInA)
 		{
 			//the position of sensor A can be the target tile
-			final tileResA = sensorA.getTileHorizontal(sensorA.position.x, sensorA.position.y, PlayState.inst.worldCollisionLayer);
-			final tileResB = sensorB.getTileHorizontal(sensorA.position.x, sensorA.position.y, PlayState.inst.worldCollisionLayer);
+			final tileResA = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, world);
+			final tileResB = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, world);
 
 			if(tileResA != null || tileResB != null)
 			{
-				FlxG.watch.addQuick("Sensor A Ground Distance", tileResA[2]);
-				FlxG.watch.addQuick("Sensor B Ground Distance", tileResB[2]);
+				FlxG.watch.addQuick("Sensor A Ground Distance", tileResA.distance);
+				FlxG.watch.addQuick("Sensor B Ground Distance", tileResB.distance);
 				
 				//check if the distance of sensor A is greater than B
-				if (tileResA[2] < tileResB[2])
+				if (tileResA.distance > tileResB.distance)
 				{
 					winSensor = sensorA;
 					sensorA.spr.color = colors[1];
@@ -428,15 +451,15 @@ class Player extends Object
 		else if(targetTileInB)
 		{
 			//the position of sensor B can be the target tile 
-			final tileResB = sensorB.getTileHorizontal(sensorB.position.x, sensorB.position.y, PlayState.inst.worldCollisionLayer);
-			final tileResA = sensorA.getTileHorizontal(sensorB.position.x, sensorB.position.y, PlayState.inst.worldCollisionLayer);
+			final tileResB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, world);
+			final tileResA = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, world);
 			if(tileResB != null || tileResA != null)
 			{
-				FlxG.watch.addQuick("Sensor A Ground Distance", tileResA[2]);
-				FlxG.watch.addQuick("Sensor B Ground Distance", tileResB[2]);
+				FlxG.watch.addQuick("Sensor A Ground Distance", tileResA.distance);
+				FlxG.watch.addQuick("Sensor B Ground Distance", tileResB.distance);
 				
 				//check if the distance of sensor B is greater than A
-				if (tileResB[2] > tileResA[2])
+				if (tileResB.distance > tileResA.distance)
 				{
 					winSensor = sensorB;
 					sensorB.spr.color = colors[1];
@@ -452,21 +475,45 @@ class Player extends Object
 		}
 		else
 			winSensor = sensorA;
-		FlxG.watch.addQuick("Winner Sensor", winSensor.tag);
-		
+
+		FlxG.watch.addQuick('Winner', winSensor.tag.getName());
+
 		return winSensor;
 	}
 
-	public function groundSensorCollision(result:Array<Dynamic>):Void
+	public function airCollide()
 	{
-		if (grounded)
+		final isMovingDown = (speed.y > 0);
+		final world = PlayState.inst.worldCollisionLayer;
+		if (isMovingDown)
 		{
-			speed.y = 0;
-			final tilePos = [result[5], result[6]];
-			if (tilePos[0] != 0 && tilePos[1] != 0 && result[0] != 0)
+			final sensorA = sensors[A];
+			final sensorB = sensors[B];
+			
+			final tilesDown = Tile.getTileVerticalDouble(center.x, sensorA.position.y, 0, 15, world);
+			if(tilesDown.near != null)
 			{
-				final anchorY = tilePos[ARRAY_Y]+TILE_SIZE;
-				y = (anchorY - result[4]) - this.height;
+				if(tilesDown.near.solidity != EMPTY)
+				{
+					trace(tilesDown);
+					final dist = 0;
+	
+					final resultA = Tile.getTileVertical(sensorA.position.x, sensorA.position.y, Math.floor(sensorA.position.x/TILE_SIZE), Math.floor(sensorA.position.y/TILE_SIZE), world);
+					final resultB = Tile.getTileVertical(sensorB.position.x, sensorB.position.y, Math.floor(sensorB.position.x/TILE_SIZE), Math.floor(sensorB.position.y/TILE_SIZE), world);
+					if(resultA.distance >= dist || resultB.distance >= dist)
+					{
+						y -= tilesDown.near.distance;
+						grounded = true;
+						trace('should align');
+						trace('aligned to ${tilesDown.near.distance} pixels to the ground from the air');
+					}
+					// if(tilesDown.near.distance > 0)
+					// {
+					// 	player.y -= tilesDown.near.distance;
+					// 	player.grounded = true;
+					// 	trace('aligned to ${tilesDown.near.distance} pixels to the ground from the air');
+					// }
+				}
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package game.collision;
 
+import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
@@ -31,6 +32,9 @@ enum SensorDirection
 	DOWN;
 }
 
+/**
+ * Originally created in 04.25.2024.
+ */
 class Sensor
 {
 	public var tag:SensorTag = null;
@@ -44,6 +48,8 @@ class Sensor
 
 	public var spr:FlxSprite;
 
+	public var debugLayer:FlxSpriteGroup;
+
 	public function new(anchor_x:Float, anchor_y:Float, tag:SensorTag = null, direction:SensorDirection)
 	{
 		this.position.set(anchor_x, anchor_y);
@@ -51,89 +57,30 @@ class Sensor
 		this.direction = direction;
 
 		spr = createDot(1,1,1,FlxColor.WHITE);
+
+		debugLayer = new FlxSpriteGroup();
+		debugLayer.visible = false;
+		#if debug
+		flixel.FlxG.state.add(debugLayer);
+		#end
 	}
 
-	public function checkTheresATile(x:Float = 0, y:Float = 0):Bool
+	public function updateSpritePosition():Void
+		spr.setPosition(this.position.x, this.position.y);
+
+	public function getTileHorizontalDouble(x:Float=0, y:Float=0, offsetx:Float, offsety:Float, world:Map<Int,Tile>)
 	{
-		final gridx:Int = Std.int(Math.floor(x)/TILE_SIZE);
-		final gridy:Int = Std.int(Math.floor(y)/TILE_SIZE);
+		var tile1 = Tile.getTileHorizontal(x, y, world);
+		var tile2 = Tile.getTileHorizontal(x + offsetx, y + offsety, world);
 
-		return PlayState.inst.currentLevel.l_collision.hasAnyTileAt(gridx, gridy);
-	}
+		final tile1distance:Float = tile1.distance;
+		final tile2distance:Float = tile2.distance;
 
-	// it will gets the tile ID, tile angle and the surface distance in width array
-	public function getTileHorizontal(x:Float=0, y:Float=0, world:Map<Int, Tile>):Array<Dynamic>
-	{
-		final tx = x;
-		final ty = y;
-		final gridx:Int = Std.int(Math.floor(tx)/TILE_SIZE);
-		final gridy:Int = Std.int(Math.floor(ty)/TILE_SIZE);
-
-		if(world.exists(getMultipliedCoords(gridx,gridy)))
-		{
-			final tile = world[getMultipliedCoords(gridx,gridy)];
-
-			final tilePixelsX = tile.posX * TILE_SIZE;
-			final tilePixelsY = tile.posY * TILE_SIZE;
-
-			final widthIndex:Int = Math.floor(Math.abs(ty - (tilePixelsY - 1)) - 1);
-			final anchorX = tilePixelsX + TILE_SIZE-1;
-			final surfaceX = tile.widthArray[widthIndex];
-			final finalX = anchorX-surfaceX;
-
-			final distance = position.x-finalX;
-
-			// this is the most crazy array ive made in my programming career
-			return [tile.tileIndex, tile.tileAngle, distance, finalX, surfaceX, tilePixelsX, tilePixelsY];
-		}
-
-		return [];
-	}
-
-	// it will gets the tile ID, tile angle and the surface distance in height array
-	public function getTileVertical(x:Float=0, y:Float=0, world:Map<Int, Tile>):Array<Dynamic>
-	{
-		final tx = x;
-		final ty = y;
-		final gridx:Int = Std.int(Math.floor(tx)/TILE_SIZE);
-		final gridy:Int = Std.int(Math.floor(ty)/TILE_SIZE);
-
-		if(world.exists(getMultipliedCoords(gridx,gridy)))
-		{
-			final tile = world[getMultipliedCoords(gridx,gridy)];
-
-			final tilePixelsX = tile.posX * TILE_SIZE;
-			final tilePixelsY = tile.posY * TILE_SIZE;
-
-			final heightIndex:Int = Math.floor(Math.abs(tx - (tilePixelsX - 1)) - 1);
-			final anchorY = tilePixelsY + TILE_SIZE-1;
-			final surfaceY = tile.heightArray[heightIndex];
-			final finalY = anchorY-surfaceY;
-
-			final distance = position.y-finalY;
-
-			// this is the most crazy array ive made in my programming career
-			return [tile.tileIndex, tile.tileAngle, distance, finalY, surfaceY, tilePixelsX, tilePixelsY];
-		}
-
-		return [];
-	}
-
-	public function getTileHorizontalDouble(x:Float=0, y:Float=0, world:Map<Int,Tile>):Array<Dynamic>
-	{
-		final tile1 = this?.getTileHorizontal(x, y, world);
-		final tile2 = this.direction == RIGHT ? this?.getTileHorizontal(x + TILE_SIZE, y, world) : this?.getTileHorizontal(x - TILE_SIZE, y, world);
-		var completeArray = [tile1, tile2];
-
-		return completeArray;
-	}
-
-	public function getTileVerticalDouble(x:Float=0, y:Float=0, world:Map<Int,Tile>):Array<Dynamic>
-	{
-		final tile1 = this?.getTileVertical(x, y, world);
-		final tile2 = this.direction != DOWN ? this?.getTileVertical(x, y - TILE_SIZE, world) : this?.getTileVertical(x, y + TILE_SIZE, world);
-		var completeArray = [tile1, tile2];
-
-		return completeArray;
+		// if (tile1distance < tile2distance)
+		// 	return tile1;
+		// else
+		// 	return tile2;
+		
+		return {tile1: tile1, tile2: tile2};
 	}
 }

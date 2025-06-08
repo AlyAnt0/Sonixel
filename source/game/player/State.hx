@@ -3,6 +3,9 @@ package game.player;
 import flixel.FlxG;
 import game.object.Player;
 
+/**
+ * Originally created in 07.05.2024.
+ */
 class State
 {
 	public var player:Player = null; // the host player is get by his own state machine that he belongs to

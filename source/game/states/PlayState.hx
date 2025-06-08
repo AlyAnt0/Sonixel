@@ -13,6 +13,9 @@ import flixel.math.FlxPoint;
 
 using flixel.util.FlxSpriteUtil;
 
+/**
+ * The original creation date is unknown.
+ */
 class PlayState extends FlxState
 {
 	public static var inst(get, never):PlayState;
@@ -34,13 +37,18 @@ class PlayState extends FlxState
 	{
 		FlxG.camera.bgColor = 0xFF909090;
 
+		super.create();
+		
+		#if debug
+		createDebugTweaks();
+		#end
 		playManager.init();
 
 		BackgroundParallax.setupBackground('TEST');
 
-		final level = Main.ldtkProject.all_worlds.Default.all_levels.testlevel_s2;
+		final level = Main.ldtkProject.all_worlds.Default.all_levels.TESTLEVEL_1;
 		currentLevel = level;
-		final tiles = level.l_collision;
+		final tiles = level.isLoaded() ?  level.l_COLLISION : null;
 		final collisionLayerDebug:FlxSpriteGroup = new FlxSpriteGroup();
 		for(xx in 0...tiles.cWid)
 		{
@@ -67,8 +75,8 @@ class PlayState extends FlxState
 			}
 		}
 		add(collisionLayerDebug);
-		player = new Player(PlayerID.SONIC);
-		player.setPosition(level.l_entities.all_player[0].pixelX, level.l_entities.all_player[0].pixelY);
+		player = new Player(PlayerID.SONIC, worldCollisionLayer);
+		player.setPosition(level.l_ENTITIES.all_PLAYER[0].pixelX, level.l_ENTITIES.all_PLAYER[0].pixelY);
 		add(player);
 
 		FlxG.camera.setScrollBoundsRect(0, 0, level.pxWid, level.pxHei);
@@ -77,8 +85,6 @@ class PlayState extends FlxState
 		// tilemap = new TiledLevel('assets/data/www.tmx');
 		// add(tilemap.foregroundTiles);
 		// tilemap.loadObjects(inst);
-
-		super.create();
 	}
 	override public function update(elapsed:Float)
 	{
@@ -91,17 +97,32 @@ class PlayState extends FlxState
 		#end
 	}
 
+	function createDebugTweaks():Void
+	{
+		#if STARTLOW
+		FlxG.updateFramerate = FlxG.drawFramerate = 3;
+		#elseif SENSOR_TEST
+		FlxG.switchState(new game.states.testing.SensorTesting());
+		#elseif SENSOR_TEST2
+		FlxG.switchState(game.states.testing.DualSensorDetect.new);
+		#end
+	}
+
 	var isLow:Bool = false;
 	// a function for tweaks for analysis and bugfixes
 	function debugTweaks(elapsed:Float):Void
 	{
 		if (FlxG.keys.justPressed.F5)
 		{
-			FlxG.switchState(new game.states.testing.SensorTesting());
 			if(FlxG.keys.pressed.ALT)
 			{
-				// TODO: another testing state but using differ of how i could making it
+				FlxG.switchState(game.states.testing.DualSensorDetect.new);
 			}
+			else
+			{
+				FlxG.switchState(new game.states.testing.SensorTesting());
+			}
+			// TODO: another testing state but using differ of how i could making it
 		}
 
 		if(FlxG.keys.justPressed.F9)

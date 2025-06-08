@@ -4,12 +4,12 @@ import flixel.math.FlxRect;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 
+/**
+ * Originally created in 04.23.2025.
+ */
 class Object extends FlxSprite
 {
-	public var center(get, never):FlxPoint;
-	public function get_center()
-		return cast origin;
-
+	public var center:FlxPoint = FlxPoint.get();
 	public var hitbox:FlxRect = FlxRect.get();
 	public var hitboxArray:Array<Float> = [
 		0.0, 0.0, 0.0, 0.0
@@ -32,13 +32,15 @@ class Object extends FlxSprite
 
 	public function move(elapsed:Float = 1.66)
 	{
-		x += (speed.x * 60) * elapsed;
-		y += (speed.y * 60) * elapsed;
+		x += speed.x;
+		y += speed.y;
 	}
 
 	override function destroy() {
 		super.destroy();
 
+		speed.put();
+		center.put();
 		hitbox.destroy();
 		hitboxArray = null;
 		radiusRect.destroy();
