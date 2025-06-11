@@ -1,5 +1,7 @@
 package game.collision;
 
+import ldtk.Layer_Tiles;
+import ldtk.Layer;
 import flixel.FlxG;
 import game.data.TileData;
 
@@ -58,13 +60,17 @@ class Tile
 
 	public static function checkTheresATile(cellX:Int = 0, cellY:Int = 0, coll:Map<Int, Tile>):Bool
 		return coll.exists(getMultipliedCoords(cellX, cellY));
+	public static function checkTheresATileLDTK(cellX:Int = 0, cellY:Int = 0, coll:Layer_Tiles):Bool
+		return coll.hasAnyTileAt(cellX, cellY);
 
 	// it will gets the tile ID, tile angle and the surface distance in width array
-	public static function getTileHorizontal(x:Float=0, y:Float=0, cellX:Int = 0, cellY:Int = 0, world:Map<Int,Tile>):{index:Int, tileAngle:Float, distance:Float, tileSurfaceX:Int, height:Int, tileX:Int, tileY:Int, solidity:TileSolidity}
+	public static function getTileHorizontal(x:Float=0, y:Float=0, cellX:Int = 0, cellY:Int = 0, tilemap:Tilemap):{index:Int, tileAngle:Float, distance:Float, tileSurfaceX:Int, height:Int, tileX:Int, tileY:Int, solidity:TileSolidity}
 	{
-		if(world.exists(getMultipliedCoords(cellX, cellY)))
+		final collisionTable = tilemap.collisionTilesTable;
+		final ldtkLayer = tilemap.ldtkLevel.l_COLLISION;
+		if(ldtkLayer.hasAnyTileAt(cellX, cellY))
 		{
-			final tile = world[getMultipliedCoords(cellX, cellY)];
+			final tile = collisionTable[getMultipliedCoords(cellX, cellY)];
 
 			final tilePixelsX = tile.posX * TILE_SIZE;
 			final tilePixelsY = tile.posY * TILE_SIZE;
@@ -94,11 +100,13 @@ class Tile
 	}
 
 	// it will gets the tile ID, tile angle and the surface distance in height array
-	public static function getTileVertical(x:Float=0, y:Float=0, cellX:Int, cellY:Int, world:Map<Int,Tile>):{index:Int, tileAngle:Float, distance:Float, tileSurfaceY:Int, height:Int, tileX:Int, tileY:Int, solidity:TileSolidity}
+	public static function getTileVertical(x:Float=0, y:Float=0, cellX:Int, cellY:Int, tilemap:Tilemap):{index:Int, tileAngle:Float, distance:Float, tileSurfaceY:Int, height:Int, tileX:Int, tileY:Int, solidity:TileSolidity}
 	{
-		if(world.exists(getMultipliedCoords(cellX, cellY)))
+		final collisionTable = tilemap.collisionTilesTable;
+		final ldtkLayer = tilemap.ldtkLevel.l_COLLISION;
+		if(ldtkLayer.hasAnyTileAt(cellX, cellY))
 		{
-			final tile = world[getMultipliedCoords(cellX,cellY)];
+			final tile = collisionTable[getTileCoordinateIndex(cellX,cellY,ldtkLayer.cWid)];
 
 			final tilePixelsX = tile.posX * TILE_SIZE;
 			final tilePixelsY = tile.posY * TILE_SIZE;
@@ -128,10 +136,10 @@ class Tile
 
 
 
-	public static function getTileVerticalDouble(x:Float=0, y:Float=0, offsetx:Float, offsety:Float, world:Map<Int,Tile>)
+	public static function getTileVerticalDouble(x:Float=0, y:Float=0, offsetx:Float, offsety:Float, tilemap:Tilemap)
 	{
-		var tile1 = Tile.getTileVertical(x, y, Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE), world);
-		var tile2 = Tile.getTileVertical(x + offsetx, y + offsety, Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE) + 1, world);
+		var tile1 = Tile.getTileVertical(x, y, Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE), tilemap);
+		var tile2 = Tile.getTileVertical(x + offsetx, y + offsety, Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE) + 1, tilemap);
 
 		var nearest = null;
 		var nearestString:String =  "";

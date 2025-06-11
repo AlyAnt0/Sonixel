@@ -22,7 +22,7 @@ class PlayState extends FlxState
 
 	public var player:Player;
 	
-	public var currentLevel:LdtkProject_Level;
+	public var currentLevel:Tilemap;
 	public var worldCollisionLayer:Map<Int, Tile> = [];
 
 	public var playManager:PlayManager = new PlayManager();
@@ -46,40 +46,13 @@ class PlayState extends FlxState
 
 		BackgroundParallax.setupBackground('TEST');
 
-		final level = Main.ldtkProject.all_worlds.Default.all_levels.TESTLEVEL_1;
-		currentLevel = level;
-		final tiles = level.isLoaded() ?  level.l_COLLISION : null;
-		final collisionLayerDebug:FlxSpriteGroup = new FlxSpriteGroup();
-		for(xx in 0...tiles.cWid)
-		{
-			for(yy in 0...tiles.cHei)
-			{
-				if(tiles.hasAnyTileAt(xx, yy))
-				{
-					//trace('tru');
-					for (tiledata in tiles.getTileStackAt(xx, yy))
-					{
-						// the tile data
-						var newCollision = new Tile(xx, yy, tiledata.flipBits & 1 != 0, tiledata.flipBits & 2 != 0, tiledata.tileId);
-						worldCollisionLayer[newCollision.posX * newCollision.posY] =  newCollision;
-
-						// now the sprite itself
-						var tile = new FlxSprite(xx * Global.TILE_SIZE, yy * Global.TILE_SIZE);
-						tile.frames = FlxTileFrames.fromBitmapAddSpacesAndBorders(TILESET_PATH, FlxPoint.get(Global.TILE_SIZE, Global.TILE_SIZE), FlxPoint.get(2,2));
-						tile.frame = tile.frames.frames[tiledata.tileId];
-						tile.flipX = newCollision.flipX;
-						tile.flipY = newCollision.flipY;
-						collisionLayerDebug.add(tile);
-					}
-				}
-			}
-		}
-		add(collisionLayerDebug);
-		player = new Player(PlayerID.SONIC, worldCollisionLayer);
-		player.setPosition(level.l_ENTITIES.all_PLAYER[0].pixelX, level.l_ENTITIES.all_PLAYER[0].pixelY);
+		currentLevel = new Tilemap(Main.ldtkProject.all_worlds.Default.all_levels.TESTLEVEL_S2);
+		
+		player = new Player(PlayerID.SONIC, currentLevel);
+		player.setPosition(currentLevel.ldtkLevel.l_ENTITIES.all_PLAYER[0].pixelX, currentLevel.ldtkLevel.l_ENTITIES.all_PLAYER[0].pixelY);
 		add(player);
 
-		FlxG.camera.setScrollBoundsRect(0, 0, level.pxWid, level.pxHei);
+		FlxG.camera.setScrollBoundsRect(0, 0, currentLevel.ldtkLevel.pxWid, currentLevel.ldtkLevel.pxHei);
 		FlxG.camera.follow(player, LOCKON, 1);
 
 		// tilemap = new TiledLevel('assets/data/www.tmx');

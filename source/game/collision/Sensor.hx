@@ -67,20 +67,4 @@ class Sensor
 
 	public function updateSpritePosition():Void
 		spr.setPosition(this.position.x, this.position.y);
-
-	public function getTileHorizontalDouble(x:Float=0, y:Float=0, offsetx:Float, offsety:Float, world:Map<Int,Tile>)
-	{
-		var tile1 = Tile.getTileHorizontal(x, y, world);
-		var tile2 = Tile.getTileHorizontal(x + offsetx, y + offsety, world);
-
-		final tile1distance:Float = tile1.distance;
-		final tile2distance:Float = tile2.distance;
-
-		// if (tile1distance < tile2distance)
-		// 	return tile1;
-		// else
-		// 	return tile2;
-		
-		return {tile1: tile1, tile2: tile2};
-	}
 }

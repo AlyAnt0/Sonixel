@@ -38,7 +38,7 @@ class Tilemap
 						{
 							// the tile data
 							var newCollision = new Tile(xx, yy, tiledata.flipBits & 1 != 0, tiledata.flipBits & 2 != 0, tiledata.tileId);
-							collisionTilesTable[getMultipliedCoords(newCollision.posX, newCollision.posY)] =  newCollision;
+							collisionTilesTable[getTileCoordinateIndex(newCollision.posX, newCollision.posY, tiles.cWid)] =  newCollision;
 	
 							// now the sprite itself
 							var tile = new FlxSprite(xx * Global.TILE_SIZE, yy * Global.TILE_SIZE);
@@ -53,4 +53,7 @@ class Tilemap
 			}
 		}
 	}
+
+	public function checkTheresTile(cellX:Int, cellY:Int)
+		return ldtkLevel.l_COLLISION.hasAnyTileAt(cellX, cellY);
 }

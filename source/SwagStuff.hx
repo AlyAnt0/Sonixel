@@ -26,6 +26,16 @@ class SwagStuff
 		return 0;
 	}
 	
+	/**
+	 * Stolen from LDTK Haxe API.
+	 * Credits go to DeepNight from Dead Cells.
+	 */
+	public static function getTileCoordinateIndex(xx:Int, yy:Int, currentLevelWidth:Int):Int
+		return xx + yy * currentLevelWidth;
+
+	/**
+	 * Unused.
+	 */
 	public static function getMultipliedCoords(xx:Int, yy:Int):Int
 		return xx * yy;
 

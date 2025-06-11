@@ -75,14 +75,14 @@ class DualSensorDetect extends FlxState
 		final senX = testSensor.position.x;
 		final senY = testSensor.position.y;
 
-		final tile1 = Tile.getTileVertical(senX, senY, cellX, cellY, level.collisionTilesTable);
-		final tile2 = Tile.getTileVertical(senX, senY, cellX, cellY+1, level.collisionTilesTable);
+		final tile1 = Tile.getTileVertical(senX, senY, cellX, cellY, level);
+		final tile2 = Tile.getTileVertical(senX, senY, cellX, cellY+1, level);
 		// debugText.text = Tile.checkTheresATile(testSensor.position.x, testSensor.position.y, level.collisionTilesTable) ? "Hey!" : "d";
 		FlxG.watch.addQuick("Sensor Pos", testSensor.position);
 		FlxG.watch.addQuick("Tile Vertical 1", tile1);
 		FlxG.watch.addQuick("Tile Vertical 2", tile2);
-		FlxG.watch.addQuick("Is there a tile above?", Tile.checkTheresATile(cellX, cellY-1, level.collisionTilesTable));
-		FlxG.watch.addQuick("Is there a tile?", Tile.checkTheresATile(cellX, cellY, level.collisionTilesTable));
-		FlxG.watch.addQuick("Is there a tile below?", Tile.checkTheresATile(cellX, cellY+1, level.collisionTilesTable));
+		FlxG.watch.addQuick("Is there a tile above?",	Tile.checkTheresATileLDTK(cellX, cellY-1, level.ldtkLevel.l_COLLISION));
+		FlxG.watch.addQuick("Is there a tile?",			Tile.checkTheresATileLDTK(cellX, cellY, level.ldtkLevel.l_COLLISION));
+		FlxG.watch.addQuick("Is there a tile below?",	Tile.checkTheresATileLDTK(cellX, cellY+1, level.ldtkLevel.l_COLLISION));
 	}
 }

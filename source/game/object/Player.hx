@@ -79,7 +79,7 @@ class Player extends Object
 
 	public var developerView:Bool = false;
 	public var debugMode:Bool = true;
-	public var collision:Map<Int, Tile> = [];
+	public var level:Tilemap;
 
 	public var sensors:Map<SensorTag, Sensor> = new Map<SensorTag, Sensor>();
 
@@ -126,7 +126,7 @@ class Player extends Object
 		FlxPoint.get(24, 33) // spin
 	];
 
-	public function new(playerID:PlayerID, world:Map<Int, Tile>):Void
+	public function new(playerID:PlayerID, level:Tilemap):Void
 	{
 		super();
 		loadGraphic('assets/images/Sonic.png', true, 48, 48);
@@ -151,7 +151,7 @@ class Player extends Object
 		// final radHeight = PlayerConst.RADIUSES[playerID][0][1]*2;	
 
 		//rspr = new FlxSprite(radiusArray[0], radiusArray[2]).makeGraphic(Std.int(radWidth), Std.int(radHeight), 0x6ee1ff00);
-		this.collision = world;
+		this.level = level;
 		move();
 	}
 
@@ -367,7 +367,7 @@ class Player extends Object
 	public function groundCollide():Void
 	{
 		final winnerSensor = giveWinSensorGround();
-		final sensorResult = Tile.getTileVerticalDouble(winnerSensor.position.x, winnerSensor.position.y, 0, 15, PlayState.inst.worldCollisionLayer);
+		final sensorResult = Tile.getTileVerticalDouble(winnerSensor.position.x, winnerSensor.position.y, 0, 15, level);
 		FlxG.watch.addQuick("Ground sensor result", sensorResult);
 		groundSensorCollision(sensorResult?.near);
 		
@@ -425,8 +425,8 @@ class Player extends Object
 		if(targetTileInA)
 		{
 			//the position of sensor A can be the target tile
-			final tileResA = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, world);
-			final tileResB = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, world);
+			final tileResA = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, level);
+			final tileResB = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, level);
 
 			if(tileResA != null || tileResB != null)
 			{
@@ -451,8 +451,8 @@ class Player extends Object
 		else if(targetTileInB)
 		{
 			//the position of sensor B can be the target tile 
-			final tileResB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, world);
-			final tileResA = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, world);
+			final tileResB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, level);
+			final tileResA = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, level);
 			if(tileResB != null || tileResA != null)
 			{
 				FlxG.watch.addQuick("Sensor A Ground Distance", tileResA.distance);
@@ -490,7 +490,7 @@ class Player extends Object
 			final sensorA = sensors[A];
 			final sensorB = sensors[B];
 			
-			final tilesDown = Tile.getTileVerticalDouble(center.x, sensorA.position.y, 0, 15, world);
+			final tilesDown = Tile.getTileVerticalDouble(center.x, sensorA.position.y, 0, 15, level);
 			if(tilesDown.near != null)
 			{
 				if(tilesDown.near.solidity != EMPTY)
@@ -498,8 +498,8 @@ class Player extends Object
 					trace(tilesDown);
 					final dist = 0;
 	
-					final resultA = Tile.getTileVertical(sensorA.position.x, sensorA.position.y, Math.floor(sensorA.position.x/TILE_SIZE), Math.floor(sensorA.position.y/TILE_SIZE), world);
-					final resultB = Tile.getTileVertical(sensorB.position.x, sensorB.position.y, Math.floor(sensorB.position.x/TILE_SIZE), Math.floor(sensorB.position.y/TILE_SIZE), world);
+					final resultA = Tile.getTileVertical(sensorA.position.x, sensorA.position.y, Math.floor(sensorA.position.x/TILE_SIZE), Math.floor(sensorA.position.y/TILE_SIZE), level);
+					final resultB = Tile.getTileVertical(sensorB.position.x, sensorB.position.y, Math.floor(sensorB.position.x/TILE_SIZE), Math.floor(sensorB.position.y/TILE_SIZE), level);
 					if(resultA.distance >= dist || resultB.distance >= dist)
 					{
 						y -= tilesDown.near.distance;
