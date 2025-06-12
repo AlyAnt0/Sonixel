@@ -399,8 +399,10 @@ class Player extends Object
 		final sensorB:Sensor = sensors[B];
 
 		var winSensor:Sensor = null;
-		var targetTileInA:Bool = Tile.checkTheresATile(Math.floor(sensorA.position.x / TILE_SIZE), Math.floor(sensorA.position.y / TILE_SIZE), PlayState.inst.worldCollisionLayer); 
-		var targetTileInB:Bool = Tile.checkTheresATile(Math.floor(sensorB.position.x / TILE_SIZE), Math.floor(sensorB.position.y / TILE_SIZE), PlayState.inst.worldCollisionLayer);
+		final senAcellX = Math.floor(sensorA.position.x / TILE_SIZE); final senAcellY = Math.floor(sensorA.position.y / TILE_SIZE);
+		final senBcellX = Math.floor(sensorB.position.x / TILE_SIZE); final senBcellY = Math.floor(sensorB.position.y / TILE_SIZE);
+		var targetTileInA:Bool = Tile.checkTheresATile(senAcellX, senAcellY, PlayState.inst.worldCollisionLayer); 
+		var targetTileInB:Bool = Tile.checkTheresATile(senBcellX, senBcellY, PlayState.inst.worldCollisionLayer);
 		// trace([targetTileInA, targetTileInB]);
 
 		final colors:Array<FlxColor> = [FlxColor.WHITE, FlxColor.RED];
@@ -425,8 +427,8 @@ class Player extends Object
 		if(targetTileInA)
 		{
 			//the position of sensor A can be the target tile
-			final tileResA = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, level);
-			final tileResB = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, level);
+			final tileResA = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, senAcellX, senAcellY, LEFT, level);
+			final tileResB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, level);
 
 			if(tileResA != null || tileResB != null)
 			{

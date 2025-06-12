@@ -47,6 +47,7 @@ class PlayState extends FlxState
 		BackgroundParallax.setupBackground('TEST');
 
 		currentLevel = new Tilemap(Main.ldtkProject.all_worlds.Default.all_levels.TESTLEVEL_S2);
+		add(currentLevel.collisionLayerDebug);
 		
 		player = new Player(PlayerID.SONIC, currentLevel);
 		player.setPosition(currentLevel.ldtkLevel.l_ENTITIES.all_PLAYER[0].pixelX, currentLevel.ldtkLevel.l_ENTITIES.all_PLAYER[0].pixelY);

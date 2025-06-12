@@ -40,7 +40,7 @@ class DualSensorDetect extends FlxState
 		add(tileDebug1);
 		add(tileDebug2);
 
-		testSensor = new Sensor(176, 152, A, DOWN);
+		testSensor = new Sensor(176, 152, A, RIGHT);
 		add(testSensor.spr);
 
 		debugText = new FlxText(2,2,FlxG.width,"Dual",8,true);
@@ -73,18 +73,34 @@ class DualSensorDetect extends FlxState
 		final senX = testSensor.position.x;
 		final senY = testSensor.position.y;
 
-		final tileAbove:Bool = 				level.ldtkLevel.l_COLLISION.hasAnyTileAt(cellX, cellY-1);
-		final tileCurrentPosition:Bool = 	level.ldtkLevel.l_COLLISION.hasAnyTileAt(cellX, cellY);
-		final tileBelow:Bool = 				level.ldtkLevel.l_COLLISION.hasAnyTileAt(cellX, cellY+1);
+		final tileCurrentPosition:Bool = level.checkTheresTile(cellX, cellY);
 
-		function getTargetTileCoordinate()
+		//Collision Horizontal
+		final tileLeft:Bool =  level.checkTheresTile(cellX-1, cellY);
+		final tileRight:Bool = level.checkTheresTile(cellX+1, cellY);
+
+		//Collision Vertical
+		final tileAbove:Bool = 	level.checkTheresTile(cellX, cellY-1);
+		final tileBelow:Bool = 	level.checkTheresTile(cellX, cellY+1);
+
+		function getTargetTileCoordinate(direction:SensorDirection)
 		{
-			switch(testSensor.direction)
+			switch(direction)
 			{
 				case LEFT:
-					//TODO
+					if(tileLeft && !tileCurrentPosition)
+						return {x: cellX-1, y: cellY};
+					else if (tileCurrentPosition && tileRight)
+						return {x: cellX+1, y: cellY};
+					else if (tileCurrentPosition && !tileRight)
+						return {x: cellX, y: cellY};
 				case RIGHT:
-					//TODO
+					if(tileRight && !tileCurrentPosition)
+						return {x: cellX+1, y: cellY};
+					else if (tileCurrentPosition && tileLeft)
+						return {x: cellX-1, y: cellY};
+					else if (tileCurrentPosition && !tileLeft)
+						return {x: cellX, y: cellY};
 				case UP:
 					// TODO
 				case DOWN:
@@ -99,20 +115,27 @@ class DualSensorDetect extends FlxState
 			return {x:-1, y:-1};
 		}
 
-		final targetCoordinate:{x:Int, y:Int} = getTargetTileCoordinate();
+		final targetCoordinate:{x:Int, y:Int} = getTargetTileCoordinate(testSensor.direction);
 		trace(targetCoordinate);
 
-		final tile1 = Tile.getTileVertical(senX, senY, cellX, cellY, level);
-		final tile2 = Tile.getTileVertical(senX, senY, targetCoordinate.x, targetCoordinate.y, level);
+		final tileH1 = Tile.getTileHorizontal(senX, senY, cellX, cellY, testSensor.direction, level);
+		final tileH2 = Tile.getTileHorizontal(senX, senY, targetCoordinate.x, targetCoordinate.y, testSensor.direction, level);
+		final tileV1 = Tile.getTileVertical(senX, senY, cellX, cellY, level);
+		final tileV2 = Tile.getTileVertical(senX, senY, targetCoordinate.x, targetCoordinate.y, level);
 
 		tileDebug1.setPosition(cellX * TILE_SIZE, cellY * TILE_SIZE);
 		tileDebug2.setPosition(targetCoordinate.x * TILE_SIZE, targetCoordinate.y * TILE_SIZE);
 		// debugText.text = Tile.checkTheresATile(testSensor.position.x, testSensor.position.y, level.collisionTilesTable) ? "Hey!" : "d";
 		FlxG.watch.addQuick("Sensor Pos", testSensor.position);
-		FlxG.watch.addQuick("Tile Vertical 1", tile1);
-		FlxG.watch.addQuick("Tile Vertical 2", tile2);
-		FlxG.watch.addQuick("Is there a tile above?",	Tile.checkTheresATileLDTK(cellX, cellY-1, level.ldtkLevel.l_COLLISION));
-		FlxG.watch.addQuick("Is there a tile?",			Tile.checkTheresATileLDTK(cellX, cellY, level.ldtkLevel.l_COLLISION));
-		FlxG.watch.addQuick("Is there a tile below?",	Tile.checkTheresATileLDTK(cellX, cellY+1, level.ldtkLevel.l_COLLISION));
+		FlxG.watch.addQuick("Tile Horizontal 1", tileH1);
+		FlxG.watch.addQuick("Tile Horizontal 2", tileH2);
+		FlxG.watch.addQuick("Tile Vertical 1",tileV1);
+		FlxG.watch.addQuick("Tile Vertical 2", tileV2);
+		
+		FlxG.watch.addQuick("Is there a tile?",			tileCurrentPosition);
+		FlxG.watch.addQuick("Is theres a tile left?", 	tileLeft);
+		FlxG.watch.addQuick("Is theres a tile right?", 	tileRight);
+		FlxG.watch.addQuick("Is there a tile above?",	tileAbove);
+		FlxG.watch.addQuick("Is there a tile below?",	tileBelow);
 	}
 }

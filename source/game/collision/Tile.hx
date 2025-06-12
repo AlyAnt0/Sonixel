@@ -1,5 +1,7 @@
 package game.collision;
 
+import game.collision.Sensor.SensorDirection;
+import flixel.util.FlxDirectionFlags;
 import ldtk.Layer_Tiles;
 import ldtk.Layer;
 import flixel.FlxG;
@@ -64,23 +66,40 @@ class Tile
 		return coll.hasAnyTileAt(cellX, cellY);
 
 	// it will gets the tile ID, tile angle and the surface distance in width array
-	public static function getTileHorizontal(x:Float=0, y:Float=0, cellX:Int = 0, cellY:Int = 0, tilemap:Tilemap):{index:Int, tileAngle:Float, distance:Float, tileSurfaceX:Int, height:Int, tileX:Int, tileY:Int, solidity:TileSolidity}
+	public static function getTileHorizontal(x:Float=0, y:Float=0, cellX:Int = 0, cellY:Int = 0, direction:SensorDirection = LEFT, tilemap:Tilemap):{index:Int, tileAngle:Float, distance:Float, tileSurfaceX:Int, height:Int, tileX:Int, tileY:Int, solidity:TileSolidity}
 	{
 		final collisionTable = tilemap.collisionTilesTable;
 		final ldtkLayer = tilemap.ldtkLevel.l_COLLISION;
 		if(ldtkLayer.hasAnyTileAt(cellX, cellY))
 		{
-			final tile = collisionTable[getMultipliedCoords(cellX, cellY)];
+			final tile = collisionTable[getTileCoordinateIndex(cellX, cellY, ldtkLayer.cWid)];
 
 			final tilePixelsX = tile.posX * TILE_SIZE;
 			final tilePixelsY = tile.posY * TILE_SIZE;
 
 			final widthIndex:Int = Math.floor(Math.abs(y - (tilePixelsY - 1)) - 1);
-			final anchorX = tilePixelsX + TILE_SIZE-1;
 			final surfaceX = tile.widthArray[widthIndex];
-			final finalX = anchorX-surfaceX;
 
-			final distance = x-finalX;
+			var anchorX = 0;
+			var finalX = 0;
+			var distance = 0.0;
+
+			if(direction == LEFT)
+			{
+				anchorX = tilePixelsX+1;
+				finalX = anchorX+surfaceX;
+				distance = finalX-x;
+			}
+			else if(direction == RIGHT)
+			{
+				anchorX = tilePixelsX+TILE_SIZE-1;
+				finalX = anchorX-surfaceX;
+				distance = x-finalX;
+			}
+			else
+			{
+				return Global.EMPTY_TILE_HORIZONTAL;
+			}
 
 			// this is the most crazy array ive made in my programming career
 			return {

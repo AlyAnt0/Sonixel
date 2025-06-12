@@ -7,7 +7,8 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 
 /**
- *	Main collision class. 
+ *	Main collision class
+ *  Originally created in 03.27.2024.
  */
 class Collision
 {
