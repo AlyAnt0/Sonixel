@@ -65,6 +65,45 @@ class Tile
 	public static function checkTheresATileLDTK(cellX:Int = 0, cellY:Int = 0, coll:Layer_Tiles):Bool
 		return coll.hasAnyTileAt(cellX, cellY);
 
+	public static function getTargetTileCoordinate(curCX:Int, curCY:Int, direction:SensorDirection, level:Tilemap)
+	{
+		final tileCurrentPosition:Bool = level.checkTheresTile(curCX, curCY);
+		//For horizontal collision 
+		final tileLeft:Bool =  level.checkTheresTile(curCX-1, curCY);
+		final tileRight:Bool = level.checkTheresTile(curCY+1, curCY);
+		//For vertical collision 
+		final tileAbove:Bool = 	level.checkTheresTile(curCX, curCY-1);
+		final tileBelow:Bool = 	level.checkTheresTile(curCX, curCY+1);
+		switch(direction)
+		{
+			case LEFT:
+				if(tileLeft && !tileCurrentPosition)
+					return {x: curCX-1, y: curCY};
+				else if (tileCurrentPosition && tileRight)
+					return {x: curCX+1, y: curCY};
+				else if (tileCurrentPosition && !tileRight)
+					return {x: curCX, y: curCY};
+			case RIGHT:
+				if(tileRight && !tileCurrentPosition)
+					return {x: curCX+1, y: curCY};
+				else if (tileCurrentPosition && tileLeft)
+					return {x: curCX-1, y: curCY};
+				else if (tileCurrentPosition && !tileLeft)
+					return {x: curCX, y: curCY};
+			case UP:
+				// TODO
+			case DOWN:
+				if (tileAbove && tileCurrentPosition)
+					return {x: curCX, y: curCY-1};
+				else if (tileBelow && !tileCurrentPosition)
+					return {x: curCX, y: curCY+1};
+				else if (tileCurrentPosition && !tileAbove)
+					return {x: curCX, y: curCY};
+		}
+
+		return {x:-1, y:-1};
+	}
+
 	// it will gets the tile ID, tile angle and the surface distance in width array
 	public static function getTileHorizontal(x:Float=0, y:Float=0, cellX:Int = 0, cellY:Int = 0, direction:SensorDirection = LEFT, tilemap:Tilemap):{index:Int, tileAngle:Float, distance:Float, tileSurfaceX:Int, height:Int, tileX:Int, tileY:Int, solidity:TileSolidity}
 	{
@@ -136,10 +175,12 @@ class Tile
 			final finalY = anchorY-surfaceY;
 
 			final distance = y-finalY;
+			var finalAngle = tile.tileAngle;
+			finalAngle += tile.flipX ? -180 : 0;
 			// this is the most crazy array ive made in my programming career
 			return {
 				index: tile.tileIndex,
-				tileAngle: tile.tileAngle,
+				tileAngle: finalAngle,
 				distance: distance,
 				tileSurfaceY: finalY,
 				height: surfaceY,

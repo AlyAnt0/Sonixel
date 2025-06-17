@@ -46,11 +46,11 @@ class PlayState extends FlxState
 
 		BackgroundParallax.setupBackground('TEST');
 
-		currentLevel = new Tilemap(Main.ldtkProject.all_worlds.Default.all_levels.TESTLEVEL_S2);
+		currentLevel = new Tilemap(Main.ldtkProject.all_worlds.Default.all_levels.PLAYER_SENSOR_TEST);
 		add(currentLevel.collisionLayerDebug);
 		
 		player = new Player(PlayerID.SONIC, currentLevel);
-		player.setPosition(currentLevel.ldtkLevel.l_ENTITIES.all_PLAYER[0].pixelX, currentLevel.ldtkLevel.l_ENTITIES.all_PLAYER[0].pixelY);
+		player.setPosition(currentLevel.ldtkLevel.l_ENTITIES.all_PLAYERCLONEDEBUG[0].pixelX, currentLevel.ldtkLevel.l_ENTITIES.all_PLAYERCLONEDEBUG[0].pixelY);
 		add(player);
 
 		FlxG.camera.setScrollBoundsRect(0, 0, currentLevel.ldtkLevel.pxWid, currentLevel.ldtkLevel.pxHei);
@@ -76,9 +76,11 @@ class PlayState extends FlxState
 		#if STARTLOW
 		FlxG.updateFramerate = FlxG.drawFramerate = 3;
 		#elseif SENSOR_TEST
-		FlxG.switchState(new game.states.testing.SensorTesting());
+		FlxG.switchState(game.states.testing.SensorTesting.new);
 		#elseif SENSOR_TEST2
 		FlxG.switchState(game.states.testing.DualSensorDetect.new);
+		#elseif PLAYER_TEST
+		FlxG.switchState(game.states.testing.PlayerCloneTerrainAlign.new);
 		#end
 	}
 

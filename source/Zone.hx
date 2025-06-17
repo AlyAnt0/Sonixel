@@ -3,6 +3,9 @@ package;
 import flixel.FlxSprite;
 import game.collision.Tile;
 
+/**
+ * Originally created in 04.23.2024. 
+ */
 class Zone
 {
 	public var chunks:Array<{x:Float, y:Float, blocks: Array<Dynamic>}> = [];

@@ -79,9 +79,6 @@ class Player extends Object
 
 	public var developerView:Bool = false;
 	public var debugMode:Bool = true;
-	public var level:Tilemap;
-
-	public var sensors:Map<SensorTag, Sensor> = new Map<SensorTag, Sensor>();
 
 	public var floorMode:CollisionMode = FLOOR; // floor mode
 
@@ -120,7 +117,6 @@ class Player extends Object
 
 	public var stateMachine:PhysicalMachine;
 
-
 	var originPoints:Array<FlxPoint> = [
 		FlxPoint.get(24, 28), // stand
 		FlxPoint.get(24, 33) // spin
@@ -128,7 +124,8 @@ class Player extends Object
 
 	public function new(playerID:PlayerID, level:Tilemap):Void
 	{
-		super();
+		super(level);
+
 		loadGraphic('assets/images/Sonic.png', true, 48, 48);
 		for(i in 0...animationStuff.length)
 			animation.add(animationStuff[i][0], animationStuff[i][1], animationStuff[i][2]);
@@ -153,6 +150,10 @@ class Player extends Object
 		//rspr = new FlxSprite(radiusArray[0], radiusArray[2]).makeGraphic(Std.int(radWidth), Std.int(radHeight), 0x6ee1ff00);
 		this.level = level;
 		move();
+	}
+
+	override function setPositionFromTilemap() {
+		trace("level uid" + level.ldtkLevel.uid);
 	}
 
 	public function updateOriginPoint(anim:String):Void
@@ -238,7 +239,7 @@ class Player extends Object
 		for (i in 0...tags.length)
 		{
 			sensors[tags[i]].position.set(sensorsArray[i].x, sensorsArray[i].y);
-			sensors[tags[i]].spr.setPosition(sensorsArray[i].x, sensorsArray[i].y);
+			sensors[tags[i]].updateSpritePosition();
 		}
 	}
 	
@@ -254,8 +255,7 @@ class Player extends Object
 		];
 		for (i in 0...tags.length)
 		{
-			sensors.set(tags[i][0], new Sensor(0, 0, tags[i][0], tags[i][1]));
-			FlxG.state.add(sensors.get(tags[i][0]).spr);
+			sensors.set(tags[i][0], new Sensor(0, 0, tags[i][0], tags[i][1], level));
 		}
 	}
 
@@ -318,16 +318,31 @@ class Player extends Object
 	function primallyUpdate():Void
 	{
 		// will flip sonics sprite horizontally
-		if(Input.isJustPressed(LEFT) && !Input.isJustPressed(RIGHT))
-			flipX = true;
-		else if(Input.isJustPressed(RIGHT) && !Input.isJustPressed(LEFT))
-			flipX = false;
+		if(animation.curAnim != null)
+		{
+			if(animation.curAnim.name != "hurt")
+			{
+				if(speed.x < 0)
+					flipX = true;
+				else if(speed.x > 0)
+					flipX = false;
+			}
+		}
 	}
 	
 	public function calculateSpeedWithAngle():Void
 	{
-		speed.x = groundSpeed *  Math.cos(Calculations.degreesToRadians(groundAngle));
-		speed.y = groundSpeed * -Math.sin(Calculations.degreesToRadians(groundAngle));	
+		if(groundAngle != 0)
+		{
+			speed.x = groundSpeed * -Math.cos(Calculations.degreesToRadians(groundAngle));
+			speed.y = groundSpeed * -Math.sin(Calculations.degreesToRadians(groundAngle));
+		}
+		else
+		{
+			speed.x = groundSpeed;
+			speed.y = groundSpeed * -Math.sin(Calculations.degreesToRadians(groundAngle));
+		}
+		trace(groundAngle);
 	}
 
 	override function move(elapsed:Float = 1.66):Void
@@ -349,7 +364,7 @@ class Player extends Object
 			x = -16;
 		}
 
-		FlxG.watch.addQuick("Players's Position", [Math.floor(x), Math.floor(y)]);
+		FlxG.watch.addQuick("Players's Position", FlxPoint.get(this.x, this.y).toString());
 		FlxG.watch.addQuick("Player's Center", center.toString());
 
 		FlxG.watch.addQuick("Player's XSpeed", speed.x);
@@ -364,12 +379,39 @@ class Player extends Object
 		if (speed.y > 16) speed.y = 16;
 	}
 
+	public function wallCollide():Void
+	{
+
+	}
+
 	public function groundCollide():Void
 	{
-		final winnerSensor = giveWinSensorGround();
-		final sensorResult = Tile.getTileVerticalDouble(winnerSensor.position.x, winnerSensor.position.y, 0, 15, level);
-		FlxG.watch.addQuick("Ground sensor result", sensorResult);
-		groundSensorCollision(sensorResult?.near);
+		final sensorA = sensors[A];
+		final sensorB = sensors[B];
+
+		final tileLeftCoord = Tile.getTargetTileCoordinate(sensorA.cX, sensorA.cY, LEFT, level);
+		final tileRightCoord = Tile.getTargetTileCoordinate(sensorB.cX, sensorB.cY, RIGHT, level);
+
+		final nearA = Tile.getTargetTileCoordinate(sensorA.cX, sensorA.cY, DOWN, level);
+		final nearB = Tile.getTargetTileCoordinate(sensorB.cX, sensorB.cY, DOWN, level);
+		
+		if (level.checkTheresTile(nearA.x, nearA.y) || level.checkTheresTile(nearB.x, nearB.y))
+		{
+			final resolutionLeftA = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, tileLeftCoord.x, nearA.y, LEFT, level);
+			final resolutionRightB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, tileLeftCoord.x, nearB.y, LEFT, level);
+		
+			final sensorUsed = sensorB;
+			final nearUsed = sensorUsed.tag == B ? nearB : nearA;
+			final direction = sensorUsed.tag == B ? RIGHT : LEFT;
+			final definitiveCollisionResolutionHorizontal = Tile.getTileHorizontal(sensorUsed.position.x, sensorUsed.position.y, sensorUsed.cX, nearUsed.y, direction, level);
+			final definitiveCollisionResolutionVertical  = Tile.getTileVertical(sensorUsed.position.x, sensorUsed.position.y, sensorUsed.cX, nearUsed.y, level);
+			if(definitiveCollisionResolutionVertical.distance > -6 && definitiveCollisionResolutionVertical.distance < 14)
+			{
+				//trace('align ${floor(definitiveCollisionResolutionVertical.distance)} pixels');
+				y = floor(definitiveCollisionResolutionVertical.tileSurfaceY - this.height)+1;
+				groundAngle = definitiveCollisionResolutionVertical.tileAngle;
+			}
+		}
 		
 		FlxG.watch.addQuick("Player's Grounded", this.grounded);
 	}
@@ -383,6 +425,7 @@ class Player extends Object
 				if(result.distance >= 0)
 				{
 					trace('aligned to ${result.distance} pixels to the ground');
+					groundAngle = result.tileAngle;
 					y -= result.distance;
 					grounded = true;
 				}
@@ -428,7 +471,7 @@ class Player extends Object
 		{
 			//the position of sensor A can be the target tile
 			final tileResA = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, senAcellX, senAcellY, LEFT, level);
-			final tileResB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, level);
+			final tileResB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, senAcellX, senAcellY, LEFT, level);
 
 			if(tileResA != null || tileResB != null)
 			{
@@ -453,8 +496,8 @@ class Player extends Object
 		else if(targetTileInB)
 		{
 			//the position of sensor B can be the target tile 
-			final tileResB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, level);
-			final tileResA = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, level);
+			final tileResB = Tile.getTileHorizontal(sensorB.position.x, sensorB.position.y, senBcellX, senBcellY, RIGHT, level);
+			final tileResA = Tile.getTileHorizontal(sensorA.position.x, sensorA.position.y, senBcellX, senBcellY, RIGHT, level);
 			if(tileResB != null || tileResA != null)
 			{
 				FlxG.watch.addQuick("Sensor A Ground Distance", tileResA.distance);
@@ -485,39 +528,59 @@ class Player extends Object
 
 	public function airCollide()
 	{
-		final isMovingDown = (speed.y > 0);
-		final world = PlayState.inst.worldCollisionLayer;
-		if (isMovingDown)
+		//air collision			
+		final orientationMove:Orientation = abs(speed.x) > abs(speed.y) ? HORIZONTAL : VERTICAL;
+		final horizontalMoveDirection:SensorDirection = speed.x > 0 ? RIGHT : LEFT;
+		final verticalMoveDirection:SensorDirection	  = speed.y > 0 ? DOWN  : UP;
+
+		if(orientationMove == VERTICAL)
 		{
-			final sensorA = sensors[A];
-			final sensorB = sensors[B];
-			
-			final tilesDown = Tile.getTileVerticalDouble(center.x, sensorA.position.y, 0, 15, level);
-			if(tilesDown.near != null)
+			final senA_CX:Int = floor(sensors[A].position.x / TILE_SIZE);
+			final senA_CY:Int = floor(sensors[A].position.y / TILE_SIZE);
+
+			final senB_CX:Int = floor(sensors[B].position.x / TILE_SIZE);
+			final senB_CY:Int = floor(sensors[B].position.y / TILE_SIZE);
+
+			final sensorPositionA = sensors[A].position;
+			final sensorPositionB = sensors[B].position;
+			switch(verticalMoveDirection)
 			{
-				if(tilesDown.near.solidity != EMPTY)
-				{
-					trace(tilesDown);
-					final dist = 0;
-	
-					final resultA = Tile.getTileVertical(sensorA.position.x, sensorA.position.y, Math.floor(sensorA.position.x/TILE_SIZE), Math.floor(sensorA.position.y/TILE_SIZE), level);
-					final resultB = Tile.getTileVertical(sensorB.position.x, sensorB.position.y, Math.floor(sensorB.position.x/TILE_SIZE), Math.floor(sensorB.position.y/TILE_SIZE), level);
-					if(resultA.distance >= dist || resultB.distance >= dist)
+				case UP:
+					// TODO
+				case DOWN:
+					final nearestCoordA = Tile.getTargetTileCoordinate(senA_CX, senA_CY, DOWN, level);
+					final nearestTileA = Tile.getTileVertical(sensorPositionA.x, sensorPositionA.y, nearestCoordA.x, nearestCoordA.y, level);
+
+					final nearestCoordB = Tile.getTargetTileCoordinate(senB_CX, senB_CY, DOWN, level);
+					final nearestTileB = Tile.getTileVertical(sensorPositionB.x, sensorPositionB.y, nearestCoordB.x, nearestCoordB.y, level);
+
+					if(nearestTileA.solidity != EMPTY || nearestTileB.solidity != EMPTY)
 					{
-						y -= tilesDown.near.distance;
-						grounded = true;
-						trace('should align');
-						trace('aligned to ${tilesDown.near.distance} pixels to the ground from the air');
+						// who is the winner?
+						trace("should have a winner sensor!");
+						final nearestLeft = Tile.getTargetTileCoordinate(senA_CX, senA_CY, LEFT, level);
+						final nearestRight = Tile.getTargetTileCoordinate(senB_CX, senB_CY, RIGHT, level);
+
+						final touchDistance:Int = floor(-(speed.y+8));
+						trace(touchDistance);
+						if(nearestTileA.distance >= touchDistance || nearestTileB.distance >= touchDistance)
+						{
+							trace("the touch distance should be added to the player y!");
+							y += abs(touchDistance);
+							groundAngle = nearestTileB.distance >= touchDistance ? nearestTileB.tileAngle : nearestTileA.tileAngle;
+							grounded = true;
+						}
 					}
-					// if(tilesDown.near.distance > 0)
-					// {
-					// 	player.y -= tilesDown.near.distance;
-					// 	player.grounded = true;
-					// 	trace('aligned to ${tilesDown.near.distance} pixels to the ground from the air');
-					// }
-				}
+				// they're out of question
+				case LEFT | RIGHT:
+					return;
 			}
 		}
+	}
+
+	function nearestTileCheckNull(hi:{x:Int, y:Int}):Bool
+	{
+		return hi.x == -1 && hi.y == -1;
 	}
 }
 
@@ -526,4 +589,10 @@ abstract PlayerID(Int) from Int to Int
 	public static final SONIC:PlayerID = 0;
 	public static final TAILS:PlayerID = 1;
 	public static final KNUX:PlayerID = 2;
+}
+
+enum Orientation
+{
+	HORIZONTAL;
+	VERTICAL;
 }

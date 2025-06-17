@@ -1,5 +1,7 @@
 package game.base;
 
+import game.collision.Sensor;
+import game.collision.Sensor.SensorTag;
 import flixel.math.FlxRect;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
@@ -9,6 +11,8 @@ import flixel.math.FlxPoint;
  */
 class Object extends FlxSprite
 {
+	public var level:Tilemap;
+
 	public var center:FlxPoint = FlxPoint.get();
 	public var hitbox:FlxRect = FlxRect.get();
 	public var hitboxArray:Array<Float> = [
@@ -25,10 +29,17 @@ class Object extends FlxSprite
 
 	public var speed:FlxPoint = new FlxPoint();
 
-	public function new()
+	public var sensors:Map<SensorTag, Sensor> = new Map<SensorTag, Sensor>();
+
+	public function new(level:Tilemap)
 	{
 		super();
+
+		this.level = level;
+		setPositionFromTilemap();
 	}
+
+	function setPositionFromTilemap():Void {}
 
 	public function move(elapsed:Float = 1.66)
 	{

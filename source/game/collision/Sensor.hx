@@ -1,5 +1,6 @@
 package game.collision;
 
+import flixel.FlxG;
 import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
@@ -42,15 +43,22 @@ class Sensor
 
 	public var host:Player;
 	public var position:FlxPoint = new FlxPoint();
-
+	public var cX(get, never):Int;
+	public var cY(get, never):Int;
+	function get_cX():Int
+		return floor(position.x / TILE_SIZE);
+	function get_cY():Int
+		return floor(position.y / TILE_SIZE);
+	
 	public var active:Bool = false;
 	public var detectedTile:Bool = false;
 
 	public var spr:FlxSprite;
+	public var level:Tilemap;
 
 	public var debugLayer:FlxSpriteGroup;
 
-	public function new(anchor_x:Float, anchor_y:Float, tag:SensorTag = null, direction:SensorDirection)
+	public function new(anchor_x:Float, anchor_y:Float, tag:SensorTag = null, direction:SensorDirection, level:Tilemap)
 	{
 		this.position.set(anchor_x, anchor_y);
 		this.tag = tag;
@@ -60,11 +68,15 @@ class Sensor
 
 		debugLayer = new FlxSpriteGroup();
 		debugLayer.visible = false;
-		#if debug
-		flixel.FlxG.state.add(debugLayer);
-		#end
 	}
 
 	public function updateSpritePosition():Void
+	{
 		spr.setPosition(this.position.x, this.position.y);
+		if(this.tag == B)
+			FlxG.watch.addQuick("Sensor Grid Position", [cX, cY]);
+	}
+
+	public function hasTileSensorPosition():Bool
+		return level.hasTile(this.cX, this.cY);
 }

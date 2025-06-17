@@ -40,7 +40,7 @@ class DualSensorDetect extends FlxState
 		add(tileDebug1);
 		add(tileDebug2);
 
-		testSensor = new Sensor(176, 152, A, RIGHT);
+		testSensor = new Sensor(176, 152, A, DOWN, level);
 		add(testSensor.spr);
 
 		debugText = new FlxText(2,2,FlxG.width,"Dual",8,true);
@@ -83,39 +83,7 @@ class DualSensorDetect extends FlxState
 		final tileAbove:Bool = 	level.checkTheresTile(cellX, cellY-1);
 		final tileBelow:Bool = 	level.checkTheresTile(cellX, cellY+1);
 
-		function getTargetTileCoordinate(direction:SensorDirection)
-		{
-			switch(direction)
-			{
-				case LEFT:
-					if(tileLeft && !tileCurrentPosition)
-						return {x: cellX-1, y: cellY};
-					else if (tileCurrentPosition && tileRight)
-						return {x: cellX+1, y: cellY};
-					else if (tileCurrentPosition && !tileRight)
-						return {x: cellX, y: cellY};
-				case RIGHT:
-					if(tileRight && !tileCurrentPosition)
-						return {x: cellX+1, y: cellY};
-					else if (tileCurrentPosition && tileLeft)
-						return {x: cellX-1, y: cellY};
-					else if (tileCurrentPosition && !tileLeft)
-						return {x: cellX, y: cellY};
-				case UP:
-					// TODO
-				case DOWN:
-					if (tileAbove && tileCurrentPosition)
-						return {x: cellX, y: cellY-1};
-					else if (tileBelow && !tileCurrentPosition)
-						return {x: cellX, y: cellY+1};
-					else if (tileCurrentPosition && !tileAbove)
-						return {x: cellX, y: cellY};
-			}
-
-			return {x:-1, y:-1};
-		}
-
-		final targetCoordinate:{x:Int, y:Int} = getTargetTileCoordinate(testSensor.direction);
+		final targetCoordinate:{x:Int, y:Int} = Tile.getTargetTileCoordinate(cellX, cellY, testSensor.direction, level);
 		trace(targetCoordinate);
 
 		final tileH1 = Tile.getTileHorizontal(senX, senY, cellX, cellY, testSensor.direction, level);
@@ -123,13 +91,14 @@ class DualSensorDetect extends FlxState
 		final tileV1 = Tile.getTileVertical(senX, senY, cellX, cellY, level);
 		final tileV2 = Tile.getTileVertical(senX, senY, targetCoordinate.x, targetCoordinate.y, level);
 
+		//visual debugging
 		tileDebug1.setPosition(cellX * TILE_SIZE, cellY * TILE_SIZE);
 		tileDebug2.setPosition(targetCoordinate.x * TILE_SIZE, targetCoordinate.y * TILE_SIZE);
 		// debugText.text = Tile.checkTheresATile(testSensor.position.x, testSensor.position.y, level.collisionTilesTable) ? "Hey!" : "d";
 		FlxG.watch.addQuick("Sensor Pos", testSensor.position);
 		FlxG.watch.addQuick("Tile Horizontal 1", tileH1);
 		FlxG.watch.addQuick("Tile Horizontal 2", tileH2);
-		FlxG.watch.addQuick("Tile Vertical 1",tileV1);
+		FlxG.watch.addQuick("Tile Vertical 1", tileV1);
 		FlxG.watch.addQuick("Tile Vertical 2", tileV2);
 		
 		FlxG.watch.addQuick("Is there a tile?",			tileCurrentPosition);
